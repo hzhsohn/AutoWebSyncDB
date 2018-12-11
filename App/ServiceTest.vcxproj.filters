@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{bf9eaa2a-78a9-40c1-a208-a77cc03fe07b}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{f02e6bbf-1ded-4f54-be08-17e8b5b5d42b}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{06cb3d47-bb0b-4f70-9355-94508b9cc49c}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="sqlite">
+      <UniqueIdentifier>{838337ec-96e9-49de-9365-52d2bf562474}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="urlcode">
+      <UniqueIdentifier>{d706c9e2-a6ed-4174-8682-281dd9630397}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="c-json">
+      <UniqueIdentifier>{ff63ca33-b98b-434c-99a3-a9303b77efcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="zhNet_Core">
+      <UniqueIdentifier>{6a090787-e591-447c-9d50-4453be4ccc4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="zhTcpServer_select">
+      <UniqueIdentifier>{01e6ab84-2c43-42ac-96a3-e860b20d2395}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ServiceTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="assist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GCHttp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sqlite\shell.c">
+      <Filter>sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="sqlite\sqlite3.c">
+      <Filter>sqlite</Filter>
+    </ClCompile>
+    <ClCompile Include="Proc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Database.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c-json\js_parser.c">
+      <Filter>c-json</Filter>
+    </ClCompile>
+    <ClCompile Include="urlcode\encoding.c">
+      <Filter>urlcode</Filter>
+    </ClCompile>
+    <ClCompile Include="zhNet_Core\netlist.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="zhNet_Core\packet.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="zhNet_Core\platform.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="zhNet_Core\session.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="zhNet_Core\socket.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="zhNet_Core\udpprocess.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="zhNet_Core\encrypt.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="zhTcpServer_select\userlist.c">
+      <Filter>zhTcpServer_select</Filter>
+    </ClCompile>
+    <ClCompile Include="zhTcpServer_select\tcp_serv_select.c">
+      <Filter>zhTcpServer_select</Filter>
+    </ClCompile>
+    <ClCompile Include="Net.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="assist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GCHttp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite\sqlite3.h">
+      <Filter>sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite\sqlite3ext.h">
+      <Filter>sqlite</Filter>
+    </ClInclude>
+    <ClInclude Include="Proc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Database.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="c-json\js_parser.h">
+      <Filter>c-json</Filter>
+    </ClInclude>
+    <ClInclude Include="c-json\js_types.h">
+      <Filter>c-json</Filter>
+    </ClInclude>
+    <ClInclude Include="urlcode\encoding.h">
+      <Filter>urlcode</Filter>
+    </ClInclude>
+    <ClInclude Include="zhNet_Core\gcdef.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="zhNet_Core\netlist.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="zhNet_Core\packet.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="zhNet_Core\platform.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="zhNet_Core\session.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="zhNet_Core\socket.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="zhNet_Core\udpprocess.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="zhNet_Core\encrypt.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="zhTcpServer_select\userlist.h">
+      <Filter>zhTcpServer_select</Filter>
+    </ClInclude>
+    <ClInclude Include="zhTcpServer_select\tcp_serv_select.h">
+      <Filter>zhTcpServer_select</Filter>
+    </ClInclude>
+    <ClInclude Include="zhTcpServer_select\userinfo.h">
+      <Filter>zhTcpServer_select</Filter>
+    </ClInclude>
+    <ClInclude Include="Net.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+</Project>

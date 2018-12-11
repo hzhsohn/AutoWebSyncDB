@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="zhNet_Core">
+      <UniqueIdentifier>{ac1ddfc2-ce0d-4a60-b593-38a3e2e6df07}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="QRCodeClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientNet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zhNet_Core\gcdef.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zhNet_Core\netlist.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zhNet_Core\packet.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zhNet_Core\platform.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zhNet_Core\session.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zhNet_Core\socket.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zhNet_Core\udpprocess.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\zhNet_Core\encrypt.h">
+      <Filter>zhNet_Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="QRCodeClient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientNet.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zhNet_Core\netlist.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zhNet_Core\packet.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zhNet_Core\platform.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zhNet_Core\session.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zhNet_Core\socket.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zhNet_Core\udpprocess.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zhNet_Core\encrypt.c">
+      <Filter>zhNet_Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="QRCodeClient.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="QRCodeClient.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
