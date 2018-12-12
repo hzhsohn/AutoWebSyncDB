@@ -124,8 +124,6 @@ void Proc::Init()
 
 BOOL Proc::Loop()
 {
-	
-
 	//定时读取数据库
 	if(time(NULL) - accessAddr.dwOldTime >= accessAddr.interval_second)
 	{
@@ -144,6 +142,8 @@ _redonnc:
 			//循环读取数据库内未提交的数据
 			memset(szHttpRebackBuf,0,128);
 			_stprintf(doUrl,_T("%s?%s"),accessAddr.url,_S2WS_CSTR(enjson));
+
+			//提交到服务器
 			http.GetFileBuf(doUrl,szHttpRebackBuf,128,0);
 			
 			//-----------------------
@@ -164,6 +164,10 @@ _redonnc:
 						printf("upload success content=%s\n",json.c_str());
 						Database::setDBUpdateSuccess(gkeyName);
 						goto _redonnc;
+					}
+					if(0==strncmp("invalid", str->str_data, str->str_len))
+					{
+						Database::setDBUpdateInvalidKey(gkeyName);
 					}
 					else //不等于OK即为失败
 					{

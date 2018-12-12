@@ -177,6 +177,39 @@ BOOL Database::setDBUpdateSuccess(char* keyName)
 		return rc != SQLITE_OK;
 }
 
+
+BOOL Database::setDBUpdateInvalidKey(char* keyName)
+{
+		sqlite3 *db;
+		char *zErrMsg = 0;
+		int  rc;
+		int key=0;
+		const char *sql ;
+		string temp;
+
+		/* Open database */
+		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+		if (rc){
+			cout <<  "Can't open database "<<db_file << endl;
+			sqlite3_free(zErrMsg);
+		}
+		else{
+			cout << "open the database successful!" << endl;
+ 
+			temp ="update table1 set is_sync=2 where key='";
+			temp+=keyName;
+			temp+="'";
+			sql = temp.c_str();	
+			rc = sqlite3_exec(db, sql, NULL, 0, &zErrMsg);
+			if (rc != SQLITE_OK){
+				cout << zErrMsg << endl;  
+				sqlite3_free(zErrMsg);
+			}
+		}
+		sqlite3_close(db);
+		return rc != SQLITE_OK;
+}
+
 string Database::readUnUpdateTop1(char* getkeyName)
 {
 		sqlite3 *db;

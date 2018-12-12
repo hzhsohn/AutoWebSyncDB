@@ -1,188 +1,211 @@
-// QRCodeClient.cpp : 定义应用程序的入口点。
+
+// QRCodeClient.cpp : 定义应用程序的类行为。
 //
 
 #include "stdafx.h"
+#include "afxwinappex.h"
+#include "afxdialogex.h"
 #include "QRCodeClient.h"
-#include "zhNet_Core\session.h"
-#include "ClientNet.h"
+#include "MainFrm.h"
 
-#define MAX_LOADSTRING 100
+#include "QRCodeClientDoc.h"
+#include "QRCodeClientView.h"
 
-// 全局变量:
-HINSTANCE hInst;								// 当前实例
-TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
-TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
 
-// 此代码模块中包含的函数的前向声明:
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPTSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+// CQRCodeClientApp
+
+BEGIN_MESSAGE_MAP(CQRCodeClientApp, CWinAppEx)
+	ON_COMMAND(ID_APP_ABOUT, &CQRCodeClientApp::OnAppAbout)
+	// 基于文件的标准文档命令
+	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
+	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
+END_MESSAGE_MAP()
+
+
+// CQRCodeClientApp 构造
+
+CQRCodeClientApp::CQRCodeClientApp()
 {
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+	m_bHiColorIcons = TRUE;
 
- 	// TODO: 在此放置代码。
-	MSG msg;
-	HACCEL hAccelTable;
+	// 支持重新启动管理器
+	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
+#ifdef _MANAGED
+	// 如果应用程序是利用公共语言运行时支持(/clr)构建的，则:
+	//     1) 必须有此附加设置，“重新启动管理器”支持才能正常工作。
+	//     2) 在您的项目中，您必须按照生成顺序向 System.Windows.Forms 添加引用。
+	System::Windows::Forms::Application::SetUnhandledExceptionMode(System::Windows::Forms::UnhandledExceptionMode::ThrowException);
+#endif
 
-	// 初始化全局字符串
-	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-	LoadString(hInstance, IDC_QRCODECLIENT, szWindowClass, MAX_LOADSTRING);
-	MyRegisterClass(hInstance);
+	// TODO: 将以下应用程序 ID 字符串替换为唯一的 ID 字符串；建议的字符串格式
+	//为 CompanyName.ProductName.SubProduct.VersionInformation
+	SetAppID(_T("QRCodeClient.AppID.NoVersion"));
 
-	// 执行应用程序初始化:
-	if (!InitInstance (hInstance, nCmdShow))
+	// TODO: 在此处添加构造代码，
+	// 将所有重要的初始化放置在 InitInstance 中
+}
+
+// 唯一的一个 CQRCodeClientApp 对象
+
+CQRCodeClientApp theApp;
+
+
+// CQRCodeClientApp 初始化
+
+BOOL CQRCodeClientApp::InitInstance()
+{
+	// 如果一个运行在 Windows XP 上的应用程序清单指定要
+	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
+	//则需要 InitCommonControlsEx()。否则，将无法创建窗口。
+	INITCOMMONCONTROLSEX InitCtrls;
+	InitCtrls.dwSize = sizeof(InitCtrls);
+	// 将它设置为包括所有要在应用程序中使用的
+	// 公共控件类。
+	InitCtrls.dwICC = ICC_WIN95_CLASSES;
+	InitCommonControlsEx(&InitCtrls);
+
+	CWinAppEx::InitInstance();
+
+
+	// 初始化 OLE 库
+	if (!AfxOleInit())
 	{
-		//网络初始化
-		ClientNetInit();
-		//
-
+		AfxMessageBox(IDP_OLE_INIT_FAILED);
 		return FALSE;
 	}
 
-	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_QRCODECLIENT));
+	EnableTaskbarInteraction(FALSE);
 
-	// 主消息循环:
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
+	// 使用 RichEdit 控件需要  AfxInitRichEdit2()	
+	// AfxInitRichEdit2();
 
-	return (int) msg.wParam;
+	// 标准初始化
+	// 如果未使用这些功能并希望减小
+	// 最终可执行文件的大小，则应移除下列
+	// 不需要的特定初始化例程
+	// 更改用于存储设置的注册表项
+	// TODO: 应适当修改该字符串，
+	// 例如修改为公司或组织名
+	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
+	LoadStdProfileSettings(0);  // 加载标准 INI 文件选项(包括 MRU)
+
+
+	InitContextMenuManager();
+
+	InitKeyboardManager();
+
+	InitTooltipManager();
+	CMFCToolTipInfo ttParams;
+	ttParams.m_bVislManagerTheme = TRUE;
+	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
+		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
+
+	// 注册应用程序的文档模板。文档模板
+	// 将用作文档、框架窗口和视图之间的连接
+	CSingleDocTemplate* pDocTemplate;
+	pDocTemplate = new CSingleDocTemplate(
+		IDR_MAINFRAME,
+		RUNTIME_CLASS(CQRCodeClientDoc),
+		RUNTIME_CLASS(CMainFrame),       // 主 SDI 框架窗口
+		RUNTIME_CLASS(CQRCodeClientView));
+	if (!pDocTemplate)
+		return FALSE;
+	pDocTemplate->SetContainerInfo(IDR_CNTR_INPLACE);
+	AddDocTemplate(pDocTemplate);
+
+
+	// 分析标准 shell 命令、DDE、打开文件操作的命令行
+	CCommandLineInfo cmdInfo;
+	ParseCommandLine(cmdInfo);
+
+
+
+	// 调度在命令行中指定的命令。如果
+	// 用 /RegServer、/Register、/Unregserver 或 /Unregister 启动应用程序，则返回 FALSE。
+	if (!ProcessShellCommand(cmdInfo))
+		return FALSE;
+
+	// 唯一的一个窗口已初始化，因此显示它并对其进行更新
+	m_pMainWnd->ShowWindow(SW_SHOW);
+	m_pMainWnd->UpdateWindow();
+	return TRUE;
 }
 
-
-
-//
-//  函数: MyRegisterClass()
-//
-//  目的: 注册窗口类。
-//
-ATOM MyRegisterClass(HINSTANCE hInstance)
+int CQRCodeClientApp::ExitInstance()
 {
-	WNDCLASSEX wcex;
+	//TODO: 处理可能已添加的附加资源
+	AfxOleTerm(FALSE);
 
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style			= CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc	= WndProc;
-	wcex.cbClsExtra		= 0;
-	wcex.cbWndExtra		= 0;
-	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_QRCODECLIENT));
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_QRCODECLIENT);
-	wcex.lpszClassName	= szWindowClass;
-	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-
-	return RegisterClassEx(&wcex);
+	return CWinAppEx::ExitInstance();
 }
 
-//
-//   函数: InitInstance(HINSTANCE, int)
-//
-//   目的: 保存实例句柄并创建主窗口
-//
-//   注释:
-//
-//        在此函数中，我们在全局变量中保存实例句柄并
-//        创建和显示主程序窗口。
-//
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+// CQRCodeClientApp 消息处理程序
+
+
+// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
+
+class CAboutDlg : public CDialogEx
 {
-   HWND hWnd;
+public:
+	CAboutDlg();
 
-   hInst = hInstance; // 将实例句柄存储在全局变量中
+// 对话框数据
+	enum { IDD = IDD_ABOUTBOX };
 
-   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+// 实现
+protected:
+	DECLARE_MESSAGE_MAP()
+};
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   return TRUE;
-}
-
-//
-//  函数: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  目的: 处理主窗口的消息。
-//
-//  WM_COMMAND	- 处理应用程序菜单
-//  WM_PAINT	- 绘制主窗口
-//  WM_DESTROY	- 发送退出消息并返回
-//
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 {
-	int wmId, wmEvent;
-	PAINTSTRUCT ps;
-	HDC hdc;
-
-	switch (message)
-	{
-	case WM_COMMAND:
-		wmId    = LOWORD(wParam);
-		wmEvent = HIWORD(wParam);
-		// 分析菜单选择:
-		switch (wmId)
-		{
-		case IDM_ABOUT:
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-			break;
-		case IDM_EXIT:
-			DestroyWindow(hWnd);
-			break;
-		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
-		break;
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		// TODO: 在此添加任意绘图代码...
-		EndPaint(hWnd, &ps);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
-	return 0;
 }
 
-// “关于”框的消息处理程序。
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
+	CDialogEx::DoDataExchange(pDX);
 }
+
+BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+END_MESSAGE_MAP()
+
+// 用于运行对话框的应用程序命令
+void CQRCodeClientApp::OnAppAbout()
+{
+	CAboutDlg aboutDlg;
+	aboutDlg.DoModal();
+}
+
+// CQRCodeClientApp 自定义加载/保存方法
+
+void CQRCodeClientApp::PreLoadState()
+{
+	BOOL bNameValid;
+	CString strName;
+	bNameValid = strName.LoadString(IDS_EDIT_MENU);
+	ASSERT(bNameValid);
+	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EDIT);
+	bNameValid = strName.LoadString(IDS_EXPLORER);
+	ASSERT(bNameValid);
+	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EXPLORER);
+}
+
+void CQRCodeClientApp::LoadCustomState()
+{
+}
+
+void CQRCodeClientApp::SaveCustomState()
+{
+}
+
+// CQRCodeClientApp 消息处理程序
+
+
+

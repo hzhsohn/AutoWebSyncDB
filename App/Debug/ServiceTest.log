@@ -1,14 +1,20 @@
-﻿生成启动时间为 2018-12-11 21:03:09。
+﻿生成启动时间为 2018-12-12 15:16:45。
      1>项目“C:\Users\han.zh\Desktop\AutoWebSyncDB_V1.0.0\App\ServiceTest.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         D:\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IzhNet_Core /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D UNICODE /D _VC80_UPGRADE=0x0600 /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Debug/" /Fd".\Debug/vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Proc.cpp
+         D:\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IzhNet_Core /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D UNICODE /D _VC80_UPGRADE=0x0600 /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Debug/" /Fd".\Debug/vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Database.cpp Proc.cpp
          Proc.cpp
      1>c:\users\han.zh\desktop\autowebsyncdb_v1.0.0\app\c-json\js_types.h(12): warning C4005: “FAILED”: 宏重定义
                  c:\program files (x86)\microsoft sdks\windows\v7.1a\include\winerror.h(23781) : 参见“FAILED”的前一个定义
-     1>c:\users\han.zh\desktop\autowebsyncdb_v1.0.0\app\proc.cpp(133): warning C4244: “=”: 从“time_t”转换到“unsigned long”，可能丢失数据
+     1>c:\users\han.zh\desktop\autowebsyncdb_v1.0.0\app\proc.cpp(131): warning C4244: “=”: 从“time_t”转换到“unsigned long”，可能丢失数据
      1>c:\users\han.zh\desktop\autowebsyncdb_v1.0.0\app\proc.cpp(153): warning C4101: “value2”: 未引用的局部变量
-         D:\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IzhNet_Core /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D UNICODE /D _VC80_UPGRADE=0x0600 /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Debug/" /Fd".\Debug/vc110.pdb" /Gd /TC /analyze- /errorReport:prompt Net.c
-         Net.c
+         Database.cpp
+     1>c:\users\han.zh\desktop\autowebsyncdb_v1.0.0\app\database.cpp(39): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 d:\microsoft visual studio 11.0\vc\include\string.h(110) : 参见“strcpy”的声明
+     1>c:\users\han.zh\desktop\autowebsyncdb_v1.0.0\app\database.cpp(133): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _itoa. See online help for details.
+                 d:\microsoft visual studio 11.0\vc\include\stdlib.h(909) : 参见“itoa”的声明
+     1>c:\users\han.zh\desktop\autowebsyncdb_v1.0.0\app\database.cpp(136): warning C4996: 'itoa': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _itoa. See online help for details.
+                 d:\microsoft visual studio 11.0\vc\include\stdlib.h(909) : 参见“itoa”的声明
+         正在生成代码...
        Link:
          D:\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"Debug\ServiceTest.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:".\Debug/ServiceTest.pdb" /SUBSYSTEM:CONSOLE,"5.01" /TLBID:1 /DYNAMICBASE:NO /IMPLIB:"C:\Users\han.zh\Desktop\AutoWebSyncDB_V1.0.0\App\Debug\ServiceTest.lib" /MACHINE:X86 /SAFESEH .\Debug/assist.obj
          .\Debug/js_parser.obj
@@ -30,9 +36,11 @@
          .\Debug/udpprocess.obj
          .\Debug/tcp_serv_select.obj
          .\Debug/userlist.obj
+     1>assist.obj : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/SAFESEH”规范)
+     1>LINK : warning LNK4067: 不明确的入口点；选定“mainCRTStartup”
          ServiceTest.vcxproj -> C:\Users\han.zh\Desktop\AutoWebSyncDB_V1.0.0\App\Debug\ServiceTest.exe
      1>已完成生成项目“C:\Users\han.zh\Desktop\AutoWebSyncDB_V1.0.0\App\ServiceTest.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:01.79
+已用时间 00:00:02.07

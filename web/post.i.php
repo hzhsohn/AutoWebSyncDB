@@ -60,6 +60,8 @@ fprintf($fp,"%s",$strJ);
 fclose($fp);
 if($isUpdate)
 {
+  //不存在于数据库的key
+  //echo '{"ret": "invalid","act":"update"}';
 	echo '{"ret": "ok","act":"update"}';
 }
 else
