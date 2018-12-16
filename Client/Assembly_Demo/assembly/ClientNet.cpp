@@ -1,31 +1,46 @@
+#include "stdafx.h"
 #include "ClientNet.h"
 
 TzhNetSession user;
 TzhPacket pack;
 time_t dwKeepTime=0;
-
-
+time_t dwReconnectTime=0;
+extern HWND g_hwndMainForm;
 
 void NetKeepTime(TzhNetSession*sion)
 {
     //这代码要放在zhSionReadData函数后面 
-	//TzhUserInfo *info;
+	
 	time_t dwTmp;
 	if(ezhNetStateConnected==sion->cState)
 	{
 		dwTmp=zhPlatGetTime();
 		//15秒一次发送补活包一次 
-		if(dwTmp - dwKeepTime/*info->dwKeepTime*/>1500)
+		if(dwTmp - dwKeepTime>15000)
 		{            
-			//打包
+			//保活包
 			TzhPacket pack;
 			zhPackWriteInit(&pack);
-			zhPackWriteInt(&pack, 2);
-			zhPackWriteString(&pack, "可爱");
+			zhPackWriteInt(&pack, 0);
 			//发送
 			zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
 			//
             dwKeepTime=dwTmp;
+		}
+	}
+	
+	//断开重连
+	if(ezhNetStateZero==sion->cState)
+	{
+		//5秒重新连接
+		dwTmp=zhPlatGetTime();
+		if(dwTmp - dwReconnectTime>5000)
+		{
+			//初始化网络
+			zhSionInit(&user,0);
+			zhSionConnect(&user,"localhost",7666);
+			//
+            dwReconnectTime=dwTmp;
 		}
 	}
 }
@@ -34,11 +49,13 @@ void zhConnect(TzhNetSession*sion,void*info,bool bResult)
 {
 	if(bResult)
 	{
-		PRINTF("%s,Connecting!! socket=%d",info,sion->s);
+		TRACE("%s,Connecting!! socket=%d",info,sion->s);
+		SendMessage(g_hwndMainForm,WM_USER+1000,0,0);
 	}
 	else
 	{
-		PRINTF("%s,Connect Fail..!!",info);
+		TRACE("%s,Connect Fail..!!",info);
+		SendMessage(g_hwndMainForm,WM_USER+1001,0,0);
 	}
 }
 
@@ -49,31 +66,33 @@ void zhRecv(TzhNetSession*sion,void*info,unsigned char*szBuf,int nLen)
 
 	zhPackReadInit(&pack,(BYTE*)szBuf,nLen);
 	zhPackReadString(&pack,Str);
-	PRINTF("%s,Data -> Size=%d ,  Str=%s ",info,pack.wSize,Str);
+	TRACE("%s,Data -> Size=%d ,  Str=%s ",info,pack.wSize,Str);
 }
 
 void zhDisconnect(TzhNetSession*sion,void*info)
 {
-	PRINTF("%s,Disconnect..! socket=%d",info,sion->s);
+	dwReconnectTime=0;
+	TRACE("%s,Disconnect..! socket=%d",info,sion->s);
+	SendMessage(g_hwndMainForm,WM_USER+1001,0,0);
 }
 
 void zhError(TzhNetSession*sion,void* info,EzhNetError err)
 {
-	printf("zhtcp %s,err=%d\n",info,err);
+	TRACE("zhtcp %s,err=%d\n",info,err);
 }
 
 int ClientNetInit()
-{
-	
+{	
+	TRACE("初始化连接\n");
 	//初始化网络
-	printf("开始连接");
 	zhSionInit(&user,0);
-	zhSionSetInfo(&user,"我叫小白");
-	zhSionConnect(&user,"localhost",7666);
+	zhSionSetInfo(&user,"");
 
 	//设置缓冲区大小
 	zhSionSetBigSockCache(&user,ezhPackCacheDefault);
 	
+	//
+	zhSionConnect(&user,"localhost",7666);
 	return 0;
 }
 

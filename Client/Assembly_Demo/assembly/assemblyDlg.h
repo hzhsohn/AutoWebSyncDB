@@ -49,6 +49,7 @@ public:
 	CStatic _ScanGunStatus;
 	
 	//JSON的内容输入框
+	CEdit _txtJsonOperater;
 	CEdit _txtJsonTime;
 	CEdit _txtJsonBatch;
 	CEdit _txtJsonPlace;
@@ -60,5 +61,8 @@ public:
 	afx_msg void OnBnClickedButton1();
 	
 	//辅助函数
-	void CassemblyDlg::setScanGun(BOOL b);
+	afx_msg LONG CassemblyDlg::msgConnectCacheServerOK(WPARAM wParam,LPARAM lParam);
+	afx_msg LONG CassemblyDlg::msgConnectCacheServerFail(WPARAM wParam,LPARAM lParam);
+	void CassemblyDlg::setConnectCacheServerOK(BOOL b);
+	void CassemblyDlg::setListAdd(CString str);
 };

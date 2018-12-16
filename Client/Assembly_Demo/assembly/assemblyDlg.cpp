@@ -8,6 +8,7 @@
 #include "afxdialogex.h"
 #include "StringUtil.h"
 #include "cJSON\cJSON.h"
+#include "ClientNet.h"
 
 //shd的定时器通讯循环
 #define SHD_TIMER	1
@@ -16,6 +17,9 @@
 #define new DEBUG_NEW
 #endif
 // CassemblyDlg 对话框
+
+//主界面的句柄
+HWND g_hwndMainForm;
 
 CassemblyDlg::CassemblyDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CassemblyDlg::IDD, pParent)
@@ -31,6 +35,7 @@ void CassemblyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT1, _txtJsonTime);
 	DDX_Control(pDX, IDC_EDIT2, _txtJsonBatch);
 	DDX_Control(pDX, IDC_EDIT3, _txtJsonPlace);
+	DDX_Control(pDX, IDC_EDIT4, _txtJsonOperater);
 }
 
 BEGIN_MESSAGE_MAP(CassemblyDlg, CDialogEx)
@@ -40,10 +45,24 @@ BEGIN_MESSAGE_MAP(CassemblyDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CassemblyDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CassemblyDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDC_BUTTON1, &CassemblyDlg::OnBnClickedButton1)
+	ON_MESSAGE(WM_USER+1000,msgConnectCacheServerOK)
+	ON_MESSAGE(WM_USER+1001,msgConnectCacheServerFail)
 END_MESSAGE_MAP()
 
 
-void CassemblyDlg::setScanGun(BOOL b)
+afx_msg LONG CassemblyDlg::msgConnectCacheServerOK(WPARAM wParam,LPARAM lParam)
+{
+	setConnectCacheServerOK(TRUE);
+	return TRUE;
+}
+afx_msg LONG CassemblyDlg::msgConnectCacheServerFail(WPARAM wParam,LPARAM lParam)
+{
+	setConnectCacheServerOK(FALSE);
+	return TRUE;
+}
+
+
+void CassemblyDlg::setConnectCacheServerOK(BOOL b)
 {
 	CBitmap BmpA;
 	if(b)
@@ -60,6 +79,17 @@ void CassemblyDlg::setScanGun(BOOL b)
 	_ScanGunStatus.ShowWindow(TRUE);
 }
 
+void CassemblyDlg::setListAdd(CString str)
+{
+	//最大显示数据行数
+	if(_lstBox.GetCount()>200)
+	{
+		_lstBox.DeleteString(0);
+	}
+	_lstBox.AddString(str);
+	_lstBox.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+}
+
 // CassemblyDlg 消息处理程序
 BOOL CassemblyDlg::OnInitDialog()
 {
@@ -72,14 +102,15 @@ BOOL CassemblyDlg::OnInitDialog()
 
 	//-------------------------------------------
 	//程序启动初始化
+	g_hwndMainForm=this->GetSafeHwnd();
 	_isGunOK=FALSE;
 	_isLockParameter=FALSE;
 	//打开定时器1 
-	SetTimer(SHD_TIMER,1000,NULL);
+	ClientNetInit();
+	SetTimer(SHD_TIMER,1,NULL);
 	//-------------------------------------------
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
-
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
@@ -111,7 +142,7 @@ void CassemblyDlg::OnPaint()
 
 	//--------------------------------------------
 	//初始化界面素材
-	setScanGun(FALSE);
+	setConnectCacheServerOK(FALSE);
 }
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
@@ -134,11 +165,10 @@ void CassemblyDlg::OnBnClickedCancel()
 //----------------------------------------------------------
 void CassemblyDlg::OnTimer(UINT nIDEvent)
 {
-	//扫描枪状态
-	setScanGun(_isGunOK);
+	//联网处理
+	ClientNetLoop();
 	CWnd::OnTimer(nIDEvent);
 }
-
 
 void CassemblyDlg::OnBnClickedButton1()
 {
@@ -147,15 +177,18 @@ void CassemblyDlg::OnBnClickedButton1()
 	{
 		CString str;
 		str.Format(_T("已锁定参数"));
-		_lstBox.AddString(str);
+		setListAdd(str);
 		
+		_txtJsonOperater.SetReadOnly(TRUE);
 		_txtJsonTime.SetReadOnly(TRUE);
 		_txtJsonBatch.SetReadOnly(TRUE);
 		_txtJsonPlace.SetReadOnly(TRUE);
-
+				
+		CString str0;
 		CString str1;
 		CString str2;
 		CString str3;
+		_txtJsonOperater.GetWindowText(str0);
 		_txtJsonTime.GetWindowText(str1);
 		_txtJsonBatch.GetWindowText(str2);
 		_txtJsonPlace.GetWindowText(str3);
@@ -164,6 +197,7 @@ void CassemblyDlg::OnBnClickedButton1()
 		cJSON *root;
 		//
 		root=cJSON_CreateObject();
+		cJSON_AddStringToObject(root,"operater",_WS2S_CSTR(str0.GetBuffer()));
 		cJSON_AddStringToObject(root,"time",_WS2S_CSTR(str1.GetBuffer()));
 		cJSON_AddStringToObject(root,"batch",_WS2S_CSTR(str2.GetBuffer()));
 		cJSON_AddStringToObject(root,"place",_WS2S_CSTR(str3.GetBuffer()));
@@ -179,13 +213,14 @@ void CassemblyDlg::OnBnClickedButton1()
 	}
 	else
 	{
+		_txtJsonOperater.SetReadOnly(FALSE);
 		_txtJsonTime.SetReadOnly(FALSE);
 		_txtJsonBatch.SetReadOnly(FALSE);
 		_txtJsonPlace.SetReadOnly(FALSE);
 
 		CString str;
 		str.Format(_T("解锁参数"));
-		_lstBox.AddString(str);
+		setListAdd(str);
 		
 		_strJSON="";
 		TRACE("JSON set null\n");

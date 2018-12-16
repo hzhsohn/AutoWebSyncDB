@@ -83,8 +83,10 @@ void Proc::Init()
 		/* Open database */
 		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
 		if (rc){
-			cout <<  "Can't open database "<<db_file << endl;
+			cout <<  "Can't open database "<<_WS2S_CSTR(db_file) << endl;
 			sqlite3_free(zErrMsg);
+			cout <<  "exit(0) program ..." << endl;
+			exit(0);
 		}
 		else{
 			cout << "open the database successful!" << endl;
@@ -106,12 +108,14 @@ void Proc::Init()
 	//³õÊ¼»¯¼ì²â
 	if(0==_tcslen(accessAddr.url))
 	{
-		cout << "err addrcess.url !!!" << endl;
+		cout << "err addrcess.url is null !" << endl;
+		cout <<  "exit(0) program ..." << endl;
 		exit(0);
 	}
 	if(0==accessAddr.interval_second)
 	{
-		cout << "err addrcess.interval_second !!! not allow is 0" << endl;
+		cout << "err addrcess.interval_second ! not allow is 0" << endl;
+		cout <<  "exit(0) program ..." << endl;
 		exit(0);
 	}
 	_tcscpy(Database::db_file , Proc::db_file);

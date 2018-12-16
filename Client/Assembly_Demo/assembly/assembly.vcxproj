@@ -137,12 +137,10 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\assembly.ico" />
-    <Image Include="res\bitmap1.bmp" />
     <Image Include="res\sgan_no.bmp" />
     <Image Include="res\sgan_yes.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\InputLib\vguang_TX800\lib\vbar.lib" />
     <Library Include="..\..\syfLib\syfLib.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

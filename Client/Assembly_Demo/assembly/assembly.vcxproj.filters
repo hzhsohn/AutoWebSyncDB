@@ -80,9 +80,6 @@
     <Image Include="res\assembly.ico">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\bitmap1.bmp">
-      <Filter>资源文件</Filter>
-    </Image>
     <Image Include="res\sgan_yes.bmp">
       <Filter>资源文件</Filter>
     </Image>
@@ -92,9 +89,6 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\syfLib\syfLib.lib">
-      <Filter>lib</Filter>
-    </Library>
-    <Library Include="..\..\InputLib\vguang_TX800\lib\vbar.lib">
       <Filter>lib</Filter>
     </Library>
   </ItemGroup>
