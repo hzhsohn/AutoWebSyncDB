@@ -1,6 +1,7 @@
-#include "StdAfx.h"
 #include "zhTcpServer_select\tcp_serv_select.h"
 #include "Net.h"
+//JSON的数据链表
+TzhList g_lstJSONData;
 
 ////////////////////////////////////////////////////////////////////////
 //保活包
@@ -45,13 +46,22 @@ void zhRecv(TzhNetSession *sion,void* info,unsigned char*szBuf,int nLen)
 	case ezhCToSDataKeep:
 			netSendKeep(sion);
 		break;
-	case ezhCToSDataJsonToCache: //16字节MD5值+字符串JSON数据
+	case ezhCToSDataJsonToCache: //32字节MD5值+字符串JSON数据
 		{
-			char md516[16]={0};
-			char strJson[2000]={0};
-			zhPackReadBinary(&pack,md516,16);
-			zhPackReadString(&pack,strJson);
-			PRINTF("Data -> strJson=%s \n",strJson);
+			TzhJSONData*jd;
+			jd=(TzhJSONData*)malloc(sizeof(TzhJSONData));
+			memset(jd,0,sizeof(TzhJSONData));			
+			zhPackReadBinary(&pack,jd->key,32);
+			zhPackReadString(&pack,jd->json);
+			if(zhListNodeAdd(&g_lstJSONData,jd,sizeof(TzhJSONData),0))
+			{
+				netSendJsonToCacheSucc(sion,jd->key);
+			}
+			else
+			{
+				netSendJsonToCacheFail(sion,jd->key);
+			}
+			PRINTF("Data ->d->key=%s strJson=%s \n",jd->key,jd->json);
 		}
 		break;
 	}
@@ -102,28 +112,33 @@ bool netSendKeep(TzhNetSession *sion)
 	zhPackWriteUnsignedChar(&pack, ezhSToCDataKeep);
 	return zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
 }
-bool netSendJsonToCacheSucc(TzhNetSession *sion,char* md516)
+bool netSendJsonToCacheSucc(TzhNetSession *sion,char* md532)
 {
 	TzhPacket pack;
 	zhPackWriteInit(&pack);
 	zhPackWriteUnsignedChar(&pack, ezhSToCDataJsonToCacheSuccess);
-	zhPackWriteBinary(&pack, md516,16);
+	zhPackWriteBinary(&pack, md532,32);
 	return zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
 }
-bool netSendJsonToCacheFail(TzhNetSession *sion,char* md516)
+bool netSendJsonToCacheFail(TzhNetSession *sion,char* md532)
 {
 	TzhPacket pack;
 	zhPackWriteInit(&pack);
 	zhPackWriteUnsignedChar(&pack, ezhSToCDataJsonToCacheFail);
-	zhPackWriteBinary(&pack, md516,16);
+	zhPackWriteBinary(&pack, md532,32);
 	return zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
 }
-bool netSendCacheUploadResult(TzhNetSession *sion,char* md516,bool isOK)
+void netSendCacheAllUserUploadResult(char* md532,unsigned char retVal)
 {
 	TzhPacket pack;
 	zhPackWriteInit(&pack);
 	zhPackWriteUnsignedChar(&pack, ezhSToCDataCacheUploadResult);
-	zhPackWriteBinary(&pack, md516,16);
-	zhPackWriteBool(&pack, isOK);
-	return zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
+	zhPackWriteBinary(&pack, md532,32);
+	zhPackWriteUnsignedChar(&pack, retVal);
+	zhSendAllUser(&pack);
+}
+
+TzhList* getJsonDataList()
+{
+	return &g_lstJSONData;
 }

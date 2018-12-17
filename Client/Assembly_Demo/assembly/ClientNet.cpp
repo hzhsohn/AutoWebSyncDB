@@ -69,15 +69,24 @@ void zhRecv(TzhNetSession*sion,void*info,unsigned char*szBuf,int nLen)
 	switch(cmd)
 	{
 	case ezhSToCDataKeep:
+			TRACE("ezhSToCDataKeep \n");
 		break;
-	case ezhSToCDataJsonToCacheSuccess: //传输到缓存服务器成功,尾随16字节MD5值
+	case ezhSToCDataJsonToCacheSuccess: //传输到缓存服务器成功,尾随32字节MD5值
+			TRACE("ezhSToCDataJsonToCacheSuccess \n");
 		break;
-	case ezhSToCDataJsonToCacheFail:	//传输到缓存服务器失败,尾随16字节MD5值
+	case ezhSToCDataJsonToCacheFail:	//传输到缓存服务器失败,尾随32字节MD5值
+			TRACE("ezhSToCDataJsonToCacheFail \n");
 		break;
-	case ezhSToCDataCacheUploadResult:	//16字节MD5值,1字节上传结果1成功,2失败
+	case ezhSToCDataCacheUploadResult:	//32字节MD5值,1字节上传结果1成功,2失败
+		{
+			char key[36]={0};
+			bool isOK=false;
+			zhPackReadBinary(&pack,key,32);
+			zhPackReadBool(&pack,&isOK);
+			TRACE("ezhSToCDataCacheUploadResult key=%s isOK=%d\n",key,isOK);
+		}
 		break;
 	}
-	TRACE("%s,Data -> Size=%d ,  Cmd=%d \n",info,pack.wSize,cmd);
 }
 
 void zhDisconnect(TzhNetSession*sion,void*info)
@@ -107,13 +116,14 @@ int ClientNetInit()
 
 bool ClientNetSend(const char*json)
 {
-	char strMD5[20]={0};
+	char strMD5[40]={0};
 	MDString((char*)json,strMD5);
-	//16字节MD5值+字符串JSON数据
+	MDStk(strMD5,strMD5);
+	//32字节MD5值+字符串JSON数据
 	TzhPacket pack;
 	zhPackWriteInit(&pack);
 	zhPackWriteUnsignedChar(&pack, ezhCToSDataJsonToCache);
-	zhPackWriteBinary(&pack, strMD5,16);
+	zhPackWriteBinary(&pack, strMD5,32);
 	zhPackWriteString(&pack, (char*)json);
 	//发送
 	return zhSionSend(&user,(char*)pack.btBuf,pack.wSize);

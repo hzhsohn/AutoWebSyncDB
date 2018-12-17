@@ -27,7 +27,8 @@ class Proc
 	static TCHAR doUrl[2048];
 	static int tcpPort;
 	static BYTE szHttpRebackBuf[128];
-	
+	//
+	static BOOL isThreadRuning;
 public:
 	Proc(void);
 	~Proc(void);
@@ -37,5 +38,6 @@ public:
 	static BOOL Loop();
 	static void End();
 
+	static void threadLoopDatabase();
 };
 

@@ -63,6 +63,40 @@ static int read_callback(void *NotUsed, int argc, char **argv, char **azColName)
     return 0;
 }
 
+void Database::genDB()
+{
+	sqlite3 *db;
+	char *zErrMsg = 0;
+	int  rc;
+	int key=0;
+	const char *sql ;
+	string temp;
+		
+	/* Open database */
+	rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+	if (rc){
+		cout <<  "Can't open database "<<_WS2S_CSTR(db_file) << endl;
+		sqlite3_free(zErrMsg);
+		cout <<  "exit(0) program ..." << endl;
+		exit(0);
+	}
+	else{
+		cout << "open the database successful!" << endl;
+	}
+ 
+	// Create table statement	
+	//字段is_sync 0未处理 ,1提交服务器成功, 2提交服务器失败无效json-key ,3网站接口数据回复异常
+	sql = "CREATE TABLE table1(autoid integer PRIMARY KEY autoincrement,key varchar(128) NOT NULL,value TEXT NOT NULL,is_sync tinyint default 0);";
+	rc = sqlite3_exec(db, sql, NULL, 0, &zErrMsg);
+	if (rc != SQLITE_OK){
+		cout << zErrMsg << endl;
+		sqlite3_free(zErrMsg);
+	}
+	else{
+		cout << "create table successful!" << endl;
+	}
+	sqlite3_close(db);
+}
 void Database::writeDB(char*keyName,char*value)
 {
 		sqlite3 *db;
@@ -177,6 +211,38 @@ BOOL Database::setDBUpdateSuccess(char* keyName)
 		return rc != SQLITE_OK;
 }
 
+
+BOOL Database::setDBUpdateExceptionKey(char* keyName)
+{
+		sqlite3 *db;
+		char *zErrMsg = 0;
+		int  rc;
+		int key=0;
+		const char *sql ;
+		string temp;
+
+		/* Open database */
+		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+		if (rc){
+			cout <<  "Can't open database "<<db_file << endl;
+			sqlite3_free(zErrMsg);
+		}
+		else{
+			cout << "open the database successful!" << endl;
+ 
+			temp ="update table1 set is_sync=3 where key='";
+			temp+=keyName;
+			temp+="'";
+			sql = temp.c_str();	
+			rc = sqlite3_exec(db, sql, NULL, 0, &zErrMsg);
+			if (rc != SQLITE_OK){
+				cout << zErrMsg << endl;  
+				sqlite3_free(zErrMsg);
+			}
+		}
+		sqlite3_close(db);
+		return rc != SQLITE_OK;
+}
 
 BOOL Database::setDBUpdateInvalidKey(char* keyName)
 {

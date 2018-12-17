@@ -18,11 +18,12 @@ public:
 	static TCHAR db_file[1024];
 	
 	//
+	static void genDB();
 	static void writeDB(char*keyName,char*value);
 	static void readDB(int start,int count);
 	static string readUnUpdateTop1(char* getkeyName);
 	static BOOL setDBUpdateInvalidKey(char* keyName);
 	static BOOL setDBUpdateSuccess(char* keyName);
-
+	static BOOL setDBUpdateExceptionKey(char* keyName);
 };
 

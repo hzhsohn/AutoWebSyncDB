@@ -32,6 +32,8 @@ void zhInitTcpProc(unsigned short		wBindPort,
 					ZH_ON_REALTIME		*pfRealTime);
 
 
+void zhTcpServ_loop();
+void zhTcpServ_free();
 
 //
 //send message to all sessions

@@ -28,6 +28,9 @@
     <Filter Include="zhTcpServer_select">
       <UniqueIdentifier>{01e6ab84-2c43-42ac-96a3-e860b20d2395}</UniqueIdentifier>
     </Filter>
+    <Filter Include="zhlist">
+      <UniqueIdentifier>{6cc59c6a-7064-457e-bd2f-3e302219d5c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ServiceTest.cpp">
@@ -89,6 +92,12 @@
     </ClCompile>
     <ClCompile Include="Net.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zhlist\zhlist.c">
+      <Filter>zhlist</Filter>
+    </ClCompile>
+    <ClCompile Include="zhlist\zhlist_exp.c">
+      <Filter>zhlist</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +169,12 @@
     </ClInclude>
     <ClInclude Include="Net.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zhlist\zhlist.h">
+      <Filter>zhlist</Filter>
+    </ClInclude>
+    <ClInclude Include="zhlist\zhlist_exp.h">
+      <Filter>zhlist</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

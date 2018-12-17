@@ -188,7 +188,6 @@ void zhInitTcpProc(unsigned short		wBindPort,
 					ZH_ON_ERROR			*pfError,
 					ZH_ON_REALTIME		*pfRealTime)
 {
-	TzhNetSession tmpUser;
 	bool ret;
 
 	g_pfAccept=pfAccept;
@@ -209,36 +208,43 @@ void zhInitTcpProc(unsigned short		wBindPort,
 	{
 		TCP_PRINT_LOG("Startup Server ok..!!");
 		TCP_PRINT_LOG("BindPort=%d",wBindPort);
-		while(true)
-		{
-			//计算处理时间,在小于80毫秒内连续加入的连续都不需要1毫秒的延时
-			g_dwNewTime=zhPlatGetTime();
-			if(g_dwNewTime-g_dwOldTime>100){zhPlatSleep(1);}
-		
-			if(zhSionAccept(&g_listern,&tmpUser))
-			{
-				//可以在这里加入连接数量限制
-				if(zhNetListCount(&g_userList)<TCP_MAX_CONNECTED)
-				{
-					TagUserNode*unode;
-					//是否取用大SOCKET(64K)缓冲区,不取用不然有时候发送大于8K以上的包会丢失
-					//如果是小型嵌入式设备3K就足够了,根据情况使用
-					zhSionSetBigSockCache(&tmpUser,ezhPackCache64K);
-					unode=ConnectAdd(tmpUser);
-					TCP_PRINT_LOG("Session Connect, Socket=%d , dwStartTime=%d,user_count=%d",tmpUser.s,tmpUser.dwStartTime,zhNetListCount(&g_userList));
-					g_dwOldTime=zhPlatGetTime();
-					g_pfAccept(&unode->sion,unode->sion.pInfo);
-				}
-				else
-				{
-					TCP_PRINT_LOG("Session connected too much...");
-					zhSionSafeClose(&tmpUser);
-				}
-			}
-		}
+
 	}
 	else
 	{TCP_PRINT_LOG("Startup Server Fail..!!");}
+}
+
+void zhTcpServ_loop()
+{
+	TzhNetSession tmpUser;
+	//计算处理时间,在小于80毫秒内连续加入的连续都不需要1毫秒的延时
+	g_dwNewTime=zhPlatGetTime();
+	if(g_dwNewTime-g_dwOldTime>100){zhPlatSleep(1);}
+		
+	if(zhSionAccept(&g_listern,&tmpUser))
+	{
+		//可以在这里加入连接数量限制
+		if(zhNetListCount(&g_userList)<TCP_MAX_CONNECTED)
+		{
+			TagUserNode*unode;
+			//是否取用大SOCKET(64K)缓冲区,不取用不然有时候发送大于8K以上的包会丢失
+			//如果是小型嵌入式设备3K就足够了,根据情况使用
+			zhSionSetBigSockCache(&tmpUser,ezhPackCache64K);
+			unode=ConnectAdd(tmpUser);
+			TCP_PRINT_LOG("Session Connect, Socket=%d , dwStartTime=%d,user_count=%d",tmpUser.s,tmpUser.dwStartTime,zhNetListCount(&g_userList));
+			g_dwOldTime=zhPlatGetTime();
+			g_pfAccept(&unode->sion,unode->sion.pInfo);
+		}
+		else
+		{
+			TCP_PRINT_LOG("Session connected too much...");
+			zhSionSafeClose(&tmpUser);
+		}
+	}
+}
+
+void zhTcpServ_free()
+{	
 	DELETE_CS(&g_threadCs);
 	DELETE_CS(&g_userCs);
 }

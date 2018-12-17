@@ -157,6 +157,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="urlcode\encoding.c" />
+    <ClCompile Include="zhlist\zhlist.c" />
+    <ClCompile Include="zhlist\zhlist_exp.c" />
     <ClCompile Include="zhNet_Core\encrypt.c" />
     <ClCompile Include="zhNet_Core\netlist.c" />
     <ClCompile Include="zhNet_Core\packet.c" />
@@ -180,6 +182,8 @@
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="StringUtil.h" />
     <ClInclude Include="urlcode\encoding.h" />
+    <ClInclude Include="zhlist\zhlist.h" />
+    <ClInclude Include="zhlist\zhlist_exp.h" />
     <ClInclude Include="zhNet_Core\encrypt.h" />
     <ClInclude Include="zhNet_Core\gcdef.h" />
     <ClInclude Include="zhNet_Core\netlist.h" />
