@@ -7,15 +7,11 @@ extern "C"{
 
 typedef struct _TagUserInfo{
 	time_t dwKeepTime;
-	bool bLogin;
-	char szAccount[32];
 }TagUserInfo;
 
 static void initizalUser(TagUserInfo*info)
 {
 	info->dwKeepTime=zhPlatGetTime();
-	info->bLogin=false;
-	memset(info->szAccount,0,sizeof(info->szAccount));
 }
 
 #ifdef __cplusplus

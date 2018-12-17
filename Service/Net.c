@@ -1,4 +1,6 @@
+#include "StdAfx.h"
 #include "zhTcpServer_select\tcp_serv_select.h"
+#include "Net.h"
 
 ////////////////////////////////////////////////////////////////////////
 //保活包
@@ -24,22 +26,35 @@ void NetKeepTimeout(TzhNetSession*sion)
 ////////////////////////////////////////////////////////////////////////////////////////////
 void zhAccept(TzhNetSession*sion,TagUserInfo* info)
 {
-	strcpy((char*)info->szAccount,"一个新连接");
 	PRINTF("zhAccept..!!  Socket=%d ",sion->s);
 }
 
 void zhRecv(TzhNetSession *sion,void* info,unsigned char*szBuf,int nLen)
 {
 	TzhPacket pack;
+	unsigned char cmd=0;
 	
 	//刷新保活包时间
 	TagUserInfo* pInfo=(TagUserInfo*)info;
 	pInfo->dwKeepTime=zhPlatGetTime();
-	
-	PRINTF("zhRecv  nLen=%d",nLen);
-	zhPackWriteInit(&pack);
-	zhPackWriteString(&pack,"服务器发送过去的消息..");	
-	zhSionSendPacket(sion,&pack);
+	//
+	zhPackReadInit(&pack,(BYTE*)szBuf,nLen);
+	zhPackReadUnsignedChar(&pack,&cmd);
+	switch(cmd)
+	{
+	case ezhCToSDataKeep:
+			netSendKeep(sion);
+		break;
+	case ezhCToSDataJsonToCache: //16字节MD5值+字符串JSON数据
+		{
+			char md516[16]={0};
+			char strJson[2000]={0};
+			zhPackReadBinary(&pack,md516,16);
+			zhPackReadString(&pack,strJson);
+			PRINTF("Data -> strJson=%s \n",strJson);
+		}
+		break;
+	}
 }
 
 void zhDisconnect(TzhNetSession*sion,void* info)
@@ -79,17 +94,36 @@ void zhRealTime(TzhNetSession *sion,void* info)
 	NetKeepTimeout(sion);
 }
 
-void zhRecvPack(TzhNetSession *sion,TagUserInfo*info,unsigned short wCmd,TzhPacket *pack)
+
+bool netSendKeep(TzhNetSession *sion)
 {
-	int i;
-	char str[1024];
-
-	zhPackReadInt(pack, &i);
-	zhPackReadString(pack, str);
-	
-	zhPackWriteInit(pack);
-	zhPackWriteString(pack,"服务器发送过去的消息..");	
-	zhSendAllUser(pack);
-
-	PRINTF("wCmd=%d,i=%d,str=%s",wCmd,i,str);
+	TzhPacket pack;
+	zhPackWriteInit(&pack);
+	zhPackWriteUnsignedChar(&pack, ezhSToCDataKeep);
+	return zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
+}
+bool netSendJsonToCacheSucc(TzhNetSession *sion,char* md516)
+{
+	TzhPacket pack;
+	zhPackWriteInit(&pack);
+	zhPackWriteUnsignedChar(&pack, ezhSToCDataJsonToCacheSuccess);
+	zhPackWriteBinary(&pack, md516,16);
+	return zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
+}
+bool netSendJsonToCacheFail(TzhNetSession *sion,char* md516)
+{
+	TzhPacket pack;
+	zhPackWriteInit(&pack);
+	zhPackWriteUnsignedChar(&pack, ezhSToCDataJsonToCacheFail);
+	zhPackWriteBinary(&pack, md516,16);
+	return zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
+}
+bool netSendCacheUploadResult(TzhNetSession *sion,char* md516,bool isOK)
+{
+	TzhPacket pack;
+	zhPackWriteInit(&pack);
+	zhPackWriteUnsignedChar(&pack, ezhSToCDataCacheUploadResult);
+	zhPackWriteBinary(&pack, md516,16);
+	zhPackWriteBool(&pack, isOK);
+	return zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
 }

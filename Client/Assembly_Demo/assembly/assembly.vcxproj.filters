@@ -19,6 +19,9 @@
     <Filter Include="cJSON">
       <UniqueIdentifier>{ba39258d-96dd-4f8a-b5ab-df006e10c163}</UniqueIdentifier>
     </Filter>
+    <Filter Include="md5">
+      <UniqueIdentifier>{ba02f93c-9866-470f-a596-f57559b8fa15}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -48,6 +51,9 @@
     <ClInclude Include="..\cJSON\cJSON.h">
       <Filter>cJSON</Filter>
     </ClInclude>
+    <ClInclude Include="..\md5\md5.h">
+      <Filter>md5</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assembly.cpp">
@@ -64,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="..\cJSON\cJSON.c">
       <Filter>cJSON</Filter>
+    </ClCompile>
+    <ClCompile Include="..\md5\md5c.c">
+      <Filter>md5</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ClientNet.h"
+#include "md5\md5.h"
 
 TzhNetSession user;
 TzhPacket pack;
@@ -21,11 +22,10 @@ void NetKeepTime(TzhNetSession*sion)
 			//保活包
 			TzhPacket pack;
 			zhPackWriteInit(&pack);
-			zhPackWriteInt(&pack, 0);
+			zhPackWriteUnsignedChar(&pack, ezhCToSDataKeep);
 			//发送
 			zhSionSend(sion,(char*)pack.btBuf,pack.wSize);
-			//
-            dwKeepTime=dwTmp;
+			dwKeepTime=dwTmp;
 		}
 	}
 	
@@ -49,30 +49,41 @@ void zhConnect(TzhNetSession*sion,void*info,bool bResult)
 {
 	if(bResult)
 	{
-		TRACE("%s,Connecting!! socket=%d",info,sion->s);
+		TRACE("%s,Connecting!! socket=%d\n",info,sion->s);
 		SendMessage(g_hwndMainForm,WM_USER+1000,0,0);
 	}
 	else
 	{
-		TRACE("%s,Connect Fail..!!",info);
+		TRACE("%s,Connect Fail..!!\n",info);
 		SendMessage(g_hwndMainForm,WM_USER+1001,0,0);
 	}
 }
 
 void zhRecv(TzhNetSession*sion,void*info,unsigned char*szBuf,int nLen)
 {
-	char Str[1024];
+	unsigned char cmd=0;
 	TzhPacket pack;
 
 	zhPackReadInit(&pack,(BYTE*)szBuf,nLen);
-	zhPackReadString(&pack,Str);
-	TRACE("%s,Data -> Size=%d ,  Str=%s ",info,pack.wSize,Str);
+	zhPackReadUnsignedChar(&pack,&cmd);
+	switch(cmd)
+	{
+	case ezhSToCDataKeep:
+		break;
+	case ezhSToCDataJsonToCacheSuccess: //传输到缓存服务器成功,尾随16字节MD5值
+		break;
+	case ezhSToCDataJsonToCacheFail:	//传输到缓存服务器失败,尾随16字节MD5值
+		break;
+	case ezhSToCDataCacheUploadResult:	//16字节MD5值,1字节上传结果1成功,2失败
+		break;
+	}
+	TRACE("%s,Data -> Size=%d ,  Cmd=%d \n",info,pack.wSize,cmd);
 }
 
 void zhDisconnect(TzhNetSession*sion,void*info)
 {
 	dwReconnectTime=0;
-	TRACE("%s,Disconnect..! socket=%d",info,sion->s);
+	TRACE("%s,Disconnect..! socket=%d\n",info,sion->s);
 	SendMessage(g_hwndMainForm,WM_USER+1001,0,0);
 }
 
@@ -87,15 +98,26 @@ int ClientNetInit()
 	//初始化网络
 	zhSionInit(&user,0);
 	zhSionSetInfo(&user,"");
-
 	//设置缓冲区大小
-	zhSionSetBigSockCache(&user,ezhPackCacheDefault);
-	
+	zhSionSetBigSockCache(&user,ezhPackCacheDefault);	
 	//
 	zhSionConnect(&user,"localhost",7666);
 	return 0;
 }
 
+bool ClientNetSend(const char*json)
+{
+	char strMD5[20]={0};
+	MDString((char*)json,strMD5);
+	//16字节MD5值+字符串JSON数据
+	TzhPacket pack;
+	zhPackWriteInit(&pack);
+	zhPackWriteUnsignedChar(&pack, ezhCToSDataJsonToCache);
+	zhPackWriteBinary(&pack, strMD5,16);
+	zhPackWriteString(&pack, (char*)json);
+	//发送
+	return zhSionSend(&user,(char*)pack.btBuf,pack.wSize);
+}
 int ClientNetLoop()
 {
 	//网络数据处理-------begin

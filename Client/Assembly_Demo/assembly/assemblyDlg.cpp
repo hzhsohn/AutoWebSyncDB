@@ -210,6 +210,7 @@ void CassemblyDlg::OnBnClickedButton1()
 		cJSON_Delete(root);
 		free(out1);
 
+		ClientNetSend(_strJSON.c_str());
 	}
 	else
 	{

@@ -25,6 +25,14 @@ void zhError(TzhNetSession* sion,void* info,EzhNetError err);
 void zhRealTime(TzhNetSession *sion,void* info);
 void zhRecvPack(TzhNetSession* sion,TagUserInfo* info,unsigned short wCmd,TzhPacket* pack);
 
+//--------------------------------------------
+//»Ø¸´¿Í»§¶Ë
+bool netSendKeep(TzhNetSession *sion);
+bool netSendJsonToCacheSucc(TzhNetSession *sion,char* md516);
+bool netSendJsonToCacheFail(TzhNetSession *sion,char* md516);
+bool netSendCacheUploadResult(TzhNetSession *sion,char* md516,bool isOK);
+
+
 #ifdef __cplusplus
 }
 #endif

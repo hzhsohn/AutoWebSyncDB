@@ -154,7 +154,7 @@ _redonnc:
 			//解释返回来网络结果
 			PJOBJECT root = NULL;
 			int i = 0;
-			PJVALUE jsonval, value2; PJSTRING str;
+			PJVALUE jsonval; PJSTRING str;
 			Js_parser_object((void**)&root, (char*)szHttpRebackBuf, &i);
 
 			jsonval = (PJVALUE)Js_object_get_value(root, "ret");

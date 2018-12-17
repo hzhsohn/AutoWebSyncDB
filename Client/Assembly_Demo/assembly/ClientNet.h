@@ -20,6 +20,7 @@ typedef enum _EzhDataProtocol{
 
 //-------------------------------
 int ClientNetInit();
+bool ClientNetSend(const char*json);
 int ClientNetLoop();
 
 
