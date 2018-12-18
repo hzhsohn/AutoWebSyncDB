@@ -91,6 +91,8 @@ void Proc::Init()
 		exit(0);
 	}
 
+	cout<<"URL=\""<<_WS2S_CSTR(accessAddr.url)<<"\""<<endl;
+	cout<<"DB=\""<<_WS2S_CSTR(Proc::db_file)<<"\""<<endl;
 	isThreadRuning=TRUE;
 	_tcscpy(Database::db_file , Proc::db_file);
 	//·ÃÎÊÍøÂç

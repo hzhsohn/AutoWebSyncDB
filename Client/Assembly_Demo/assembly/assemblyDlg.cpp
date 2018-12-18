@@ -108,6 +108,9 @@ BOOL CassemblyDlg::OnInitDialog()
 	//打开定时器1 
 	ClientNetInit();
 	SetTimer(SHD_TIMER,1,NULL);
+	ScanGunContentLen=0;
+	memset(strScanGunCache,0,sizeof(strScanGunCache));
+	memset(strScanContent,0,sizeof(strScanContent));
 	//-------------------------------------------
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -227,4 +230,59 @@ void CassemblyDlg::OnBnClickedButton1()
 		TRACE("JSON set null\n");
 
 	}
+}
+
+//搜索枪录入
+BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
+{
+		time_t tmpT=zhPlatGetTime();
+
+		if (pMsg->message == WM_CHAR)
+		{	
+			if(0==ScanGunContentLen)
+			{
+				dwScanGunTime=tmpT;
+			}
+			strScanGunCache[ScanGunContentLen]=(char)pMsg->wParam;
+			ScanGunContentLen++;
+			strScanGunCache[ScanGunContentLen]=0;
+		}
+
+		//100毫秒内要录入完毕
+		if(ScanGunContentLen>0)
+		{
+			if(tmpT-dwScanGunTime>100)
+			{
+				ScanGunContentLen=0;
+				dwScanGunTime=tmpT;
+				//100毫秒内录入大于5个字符.就是扫描枪,否则视为普通输入
+				if(strlen(strScanGunCache)>5)
+				{
+					if(strcmp(strScanContent,strScanGunCache))
+					{
+						dwScanGunClearTime=tmpT;
+						strcpy(strScanContent,strScanGunCache);
+						TRACE("扫码枪内容=%s\n",strScanGunCache);
+					}
+					else
+					{
+						TRACE("重复录入=%s\n",strScanGunCache);
+					}
+				}
+				else
+				{
+					TRACE("扫码枪字数不足\n");
+				}
+			}
+		}
+		else
+		{
+			//2秒内不能录入重复数值
+			if(tmpT-dwScanGunClearTime>2000)
+			{
+				strcpy(strScanContent,"");
+				dwScanGunClearTime=tmpT;
+			}
+		}
+	return __super::PreTranslateMessage(pMsg);
 }

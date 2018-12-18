@@ -60,6 +60,14 @@ public:
 	//事件
 	afx_msg void OnBnClickedButton1();
 	
+	//扫描枪输入处理
+	virtual BOOL PreTranslateMessage(MSG * pMsg);
+	time_t dwScanGunTime;
+	time_t dwScanGunClearTime;
+	int ScanGunContentLen;
+	char strScanGunCache[512];
+	char strScanContent[512];
+
 	//辅助函数
 	afx_msg LONG CassemblyDlg::msgConnectCacheServerOK(WPARAM wParam,LPARAM lParam);
 	afx_msg LONG CassemblyDlg::msgConnectCacheServerFail(WPARAM wParam,LPARAM lParam);
