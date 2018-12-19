@@ -9,6 +9,7 @@
 #include "StringUtil.h"
 #include "cJSON\cJSON.h"
 #include "ClientNet.h"
+#include "md5\md5.h"
 
 //shd的定时器通讯循环
 #define SHD_TIMER	1
@@ -47,6 +48,10 @@ BEGIN_MESSAGE_MAP(CassemblyDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CassemblyDlg::OnBnClickedButton1)
 	ON_MESSAGE(WM_USER+1000,msgConnectCacheServerOK)
 	ON_MESSAGE(WM_USER+1001,msgConnectCacheServerFail)
+	ON_MESSAGE(WM_USER+1002,msgConnectedKeep)
+	ON_MESSAGE(WM_USER+1003,msgCacheDataSuccess)
+	ON_MESSAGE(WM_USER+1004,msgCacheDataFail)
+	ON_MESSAGE(WM_USER+1005,msgCacheUploadResult)
 END_MESSAGE_MAP()
 
 
@@ -60,7 +65,43 @@ afx_msg LONG CassemblyDlg::msgConnectCacheServerFail(WPARAM wParam,LPARAM lParam
 	setConnectCacheServerOK(FALSE);
 	return TRUE;
 }
-
+afx_msg LONG CassemblyDlg::msgConnectedKeep(WPARAM wParam,LPARAM lParam)
+{
+	setConnectCacheServerOK(TRUE);
+	return TRUE;
+}
+afx_msg LONG CassemblyDlg::msgCacheDataSuccess(WPARAM wParam,LPARAM lParam)
+{
+	char*key=(char*)wParam;
+	CString str;
+	str.Format(_T("%s,提交缓存成功!"),_S2WS_CSTR(key));
+	setListAdd(str);
+	return TRUE;
+}
+afx_msg LONG CassemblyDlg::msgCacheDataFail(WPARAM wParam,LPARAM lParam)
+{
+	char*key=(char*)wParam;
+	CString str;
+	str.Format(_T("%s,提交缓存失败."),_S2WS_CSTR(key));
+	setListAdd(str);
+	return TRUE;
+}
+afx_msg LONG CassemblyDlg::msgCacheUploadResult(WPARAM wParam,LPARAM lParam)
+{
+	char*key=(char*)wParam;
+	bool isok=(bool)lParam;
+	CString str;
+	if(isok)
+	{
+		str.Format(_T("%s,上传服务器成功!"),_S2WS_CSTR(key));
+	}
+	else
+	{
+		str.Format(_T("%s,上传服务器失败."),_S2WS_CSTR(key));
+	}
+	setListAdd(str);
+	return TRUE;
+}
 
 void CassemblyDlg::setConnectCacheServerOK(BOOL b)
 {
@@ -186,34 +227,9 @@ void CassemblyDlg::OnBnClickedButton1()
 		_txtJsonTime.SetReadOnly(TRUE);
 		_txtJsonBatch.SetReadOnly(TRUE);
 		_txtJsonPlace.SetReadOnly(TRUE);
-				
-		CString str0;
-		CString str1;
-		CString str2;
-		CString str3;
-		_txtJsonOperater.GetWindowText(str0);
-		_txtJsonTime.GetWindowText(str1);
-		_txtJsonBatch.GetWindowText(str2);
-		_txtJsonPlace.GetWindowText(str3);
-
-		char *out1;
-		cJSON *root;
 		//
-		root=cJSON_CreateObject();
-		cJSON_AddStringToObject(root,"operater",_WS2S_CSTR(str0.GetBuffer()));
-		cJSON_AddStringToObject(root,"time",_WS2S_CSTR(str1.GetBuffer()));
-		cJSON_AddStringToObject(root,"batch",_WS2S_CSTR(str2.GetBuffer()));
-		cJSON_AddStringToObject(root,"place",_WS2S_CSTR(str3.GetBuffer()));
-		//
-		out1=cJSON_PrintUnformatted(root);
-		//	
-		_strJSON=out1;
-		TRACE("JSON=%s\n",out1);
-		//-------------------------------
-		cJSON_Delete(root);
-		free(out1);
-
-		ClientNetSend(_strJSON.c_str());
+		_strJSON="";
+		_lstBox.SetFocus();
 	}
 	else
 	{
@@ -232,6 +248,56 @@ void CassemblyDlg::OnBnClickedButton1()
 	}
 }
 
+BOOL CassemblyDlg::genJson(const char*scanContent)
+{
+	//----------
+	//判断扫描内容的格式是否正确
+	if(memcmp(scanContent,"http",4))//头内容不为http
+	{
+		setListAdd(_T("[错误]----扫描内容格式错误,不为http或https连接"));
+		return FALSE;
+	}
+	if(!strchr(scanContent,'?'))//不存在问号
+	{
+		setListAdd(_T("[错误]----扫描内容格式错误,不存在唯一标识参数"));
+		return FALSE;
+	}
+	//
+	if(_isLockParameter)
+	{		
+		CString str0;
+		CString str1;
+		CString str2;
+		CString str3;
+		_txtJsonOperater.GetWindowText(str0);
+		_txtJsonTime.GetWindowText(str1);
+		_txtJsonBatch.GetWindowText(str2);
+		_txtJsonPlace.GetWindowText(str3);
+
+		char *out1;
+		cJSON *root;
+		//
+		root=cJSON_CreateObject();
+		cJSON_AddStringToObject(root,"_scan",scanContent);
+		cJSON_AddStringToObject(root,"_act","update"); //内容填充模式,追加或更新
+		cJSON_AddStringToObject(root,"operater",_WS2S_CSTR(str0.GetBuffer()));
+		cJSON_AddStringToObject(root,"time",_WS2S_CSTR(str1.GetBuffer()));
+		cJSON_AddStringToObject(root,"batch",_WS2S_CSTR(str2.GetBuffer()));
+		cJSON_AddStringToObject(root,"place",_WS2S_CSTR(str3.GetBuffer()));
+		//
+		out1=cJSON_PrintUnformatted(root);
+		//	
+		_strJSON=out1;
+		TRACE("JSON=%s\n",out1);
+		//-------------------------------
+		cJSON_Delete(root);
+		free(out1);
+		//
+		return TRUE;
+	}
+	return FALSE;
+}
+
 //搜索枪录入
 BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
 {
@@ -239,18 +305,18 @@ BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
 
 		if (pMsg->message == WM_CHAR)
 		{	
-			if(0==ScanGunContentLen)
+			if((char)pMsg->wParam!='\r' && (char)pMsg->wParam!='\n')
 			{
 				dwScanGunTime=tmpT;
+				strScanGunCache[ScanGunContentLen]=(char)pMsg->wParam;
+				ScanGunContentLen++;
+				strScanGunCache[ScanGunContentLen]=0;
 			}
-			strScanGunCache[ScanGunContentLen]=(char)pMsg->wParam;
-			ScanGunContentLen++;
-			strScanGunCache[ScanGunContentLen]=0;
 		}
 
-		//100毫秒内要录入完毕
 		if(ScanGunContentLen>0)
-		{
+		{				
+			//100毫秒后不再录入视为完毕
 			if(tmpT-dwScanGunTime>100)
 			{
 				ScanGunContentLen=0;
@@ -263,6 +329,27 @@ BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
 						dwScanGunClearTime=tmpT;
 						strcpy(strScanContent,strScanGunCache);
 						TRACE("扫码枪内容=%s\n",strScanGunCache);
+						//提交到缓存服务器
+						if(_isLockParameter)
+						{
+							//生成JSON并提交到缓存服务器
+							if(genJson(strScanGunCache))
+							{
+								char *json=(char*)_strJSON.c_str();
+								char strMD5[40]={0};
+								MDString(json,strMD5);
+								MDStk(strMD5,strMD5);
+								ClientNetSend(strMD5,json);
+								//								
+								CString str;
+								str.Format(_T("提交 md5=%s json=%s"),_S2WS_CSTR(strMD5),_S2WS_CSTR(json));
+								setListAdd(str);
+							}
+						}
+						else
+						{
+							setListAdd(_T("[错误]----提交失败,参数未锁定"));
+						}
 					}
 					else
 					{

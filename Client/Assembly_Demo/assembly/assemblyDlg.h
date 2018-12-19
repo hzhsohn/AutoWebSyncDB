@@ -71,6 +71,11 @@ public:
 	//¸¨Öúº¯Êý
 	afx_msg LONG CassemblyDlg::msgConnectCacheServerOK(WPARAM wParam,LPARAM lParam);
 	afx_msg LONG CassemblyDlg::msgConnectCacheServerFail(WPARAM wParam,LPARAM lParam);
+	afx_msg LONG CassemblyDlg::msgConnectedKeep(WPARAM wParam,LPARAM lParam);
+	afx_msg LONG CassemblyDlg::msgCacheDataSuccess(WPARAM wParam,LPARAM lParam);
+	afx_msg LONG CassemblyDlg::msgCacheDataFail(WPARAM wParam,LPARAM lParam);
+	afx_msg LONG CassemblyDlg::msgCacheUploadResult(WPARAM wParam,LPARAM lParam);
 	void CassemblyDlg::setConnectCacheServerOK(BOOL b);
 	void CassemblyDlg::setListAdd(CString str);
+	BOOL genJson(const char*scanContent);
 };
