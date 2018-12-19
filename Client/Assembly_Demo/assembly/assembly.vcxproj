@@ -60,7 +60,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>uafxcwd.lib;LIBCMTD.lib;</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;uafxcwd.lib;LIBCMTD.lib;</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;uafxcwd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -90,8 +90,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
@@ -115,6 +114,7 @@
     <ClInclude Include="assembly.h" />
     <ClInclude Include="assemblyDlg.h" />
     <ClInclude Include="ClientNet.h" />
+    <ClInclude Include="getwork.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringUtil.h" />

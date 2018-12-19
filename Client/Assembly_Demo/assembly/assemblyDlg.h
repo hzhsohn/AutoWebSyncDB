@@ -40,6 +40,9 @@ public:
 	//定时器
 	void OnTimer(UINT nIDEvent);
 
+	//
+	CString okWavPath;
+
 	//初始化
 	CButton _btn1;
 	CListBox _lstBox;

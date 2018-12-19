@@ -10,6 +10,8 @@
 #include "cJSON\cJSON.h"
 #include "ClientNet.h"
 #include "md5\md5.h"
+#include <mmSystem.h>
+#include "getwork.h"
 
 //shd的定时器通讯循环
 #define SHD_TIMER	1
@@ -75,7 +77,8 @@ afx_msg LONG CassemblyDlg::msgCacheDataSuccess(WPARAM wParam,LPARAM lParam)
 	char*key=(char*)wParam;
 	CString str;
 	str.Format(_T("%s,提交缓存成功!"),_S2WS_CSTR(key));
-	setListAdd(str);
+	setListAdd(str);	
+	PlaySound(okWavPath, NULL ,SND_FILENAME | SND_ASYNC); 
 	return TRUE;
 }
 afx_msg LONG CassemblyDlg::msgCacheDataFail(WPARAM wParam,LPARAM lParam)
@@ -113,8 +116,7 @@ void CassemblyDlg::setConnectCacheServerOK(BOOL b)
 	else
 	{
 		BmpA.LoadBitmap(IDB_SGAN_NO);
-	}	
-
+	}
 	_ScanGunStatus.ModifyStyle(0xF,SS_BITMAP|SS_CENTERIMAGE);//设置静态控件的样式，使得它可以使用位图
 	_ScanGunStatus.SetBitmap((HBITMAP)BmpA);
 	_ScanGunStatus.ShowWindow(TRUE);
@@ -152,6 +154,15 @@ BOOL CassemblyDlg::OnInitDialog()
 	ScanGunContentLen=0;
 	memset(strScanGunCache,0,sizeof(strScanGunCache));
 	memset(strScanContent,0,sizeof(strScanContent));
+	//
+	CTime time;
+	time = CTime::GetCurrentTime();
+	CString curdata = time.Format("%Y-%m-%d");
+	_txtJsonTime.SetWindowText(curdata);
+	//
+	char bufpath[512]={0};
+	getCurrentPath("ok.wav",bufpath,512);
+	okWavPath=bufpath;
 	//-------------------------------------------
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -244,7 +255,6 @@ void CassemblyDlg::OnBnClickedButton1()
 		
 		_strJSON="";
 		TRACE("JSON set null\n");
-
 	}
 }
 
@@ -342,7 +352,7 @@ BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
 								ClientNetSend(strMD5,json);
 								//								
 								CString str;
-								str.Format(_T("提交 md5=%s json=%s"),_S2WS_CSTR(strMD5),_S2WS_CSTR(json));
+								str.Format(_T("提交 %s %s"),_S2WS_CSTR(strMD5),_S2WS_CSTR(json));
 								setListAdd(str);
 							}
 						}

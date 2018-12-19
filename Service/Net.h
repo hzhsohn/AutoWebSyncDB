@@ -15,8 +15,8 @@ typedef enum _EzhDataProtocol{
 	ezhSToCDataKeep=1,
 	ezhCToSDataJsonToCache=2,//32字节MD5值+字符串JSON数据
 	ezhSToCDataJsonToCacheSuccess=3,//传输到缓存服务器成功,尾随32字节MD5值
-	ezhSToCDataJsonToCacheFail=5,//传输到缓存服务器失败,尾随32字节MD5值
-	ezhSToCDataCacheUploadResult//32字节MD5值,1字节上传结果1成功,2无效json-key,3提交数据异常
+	ezhSToCDataJsonToCacheFail=4,//传输到缓存服务器失败,尾随32字节MD5值
+	ezhSToCDataCacheUploadResult=5//32字节MD5值,1字节上传结果1成功,2失败
 }EzhDataProtocol;
 
 typedef struct _TzhJSONData

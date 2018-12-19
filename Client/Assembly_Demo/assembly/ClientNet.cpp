@@ -128,7 +128,6 @@ int ClientNetInit()
 
 bool ClientNetSend(const char* md532,const char*json)
 {
-
 	//32字节MD5值+字符串JSON数据
 	TzhPacket pack;
 	zhPackWriteInit(&pack);

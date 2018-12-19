@@ -54,6 +54,9 @@
     <ClInclude Include="..\md5\md5.h">
       <Filter>md5</Filter>
     </ClInclude>
+    <ClInclude Include="getwork.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assembly.cpp">
