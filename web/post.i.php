@@ -45,7 +45,7 @@ $_act='';
 $json=json_decode($parameter, true);
 if(null==$json)
 {
-  echo 'json format is error.';
+  echo '{"ret":"json_error"}';
   exit;
 }
 $_act=$json['_act'];

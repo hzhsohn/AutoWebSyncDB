@@ -148,10 +148,17 @@ void  Proc::threadLoopDatabase()
 			string json=Database::readUnUpdateTop1(gkeyName);
 			if(json.length()>0)
 			{
+				char *utf8c;
 				char *enjson;int k;
 				char*szb=(char*)json.c_str();
+				int nnlen=strlen(szb)*5;
+				utf8c=(char *)malloc(nnlen);
+				memset(utf8c,0,nnlen);
+				//编码转换
+				Gb2312ToUtf8(szb,strlen(szb),utf8c);
 				//加码
-				enjson=urlencode(szb,strlen(szb),&k);
+				enjson=urlencode(utf8c,strlen(utf8c),&k);
+				free(utf8c);
 
 				//循环读取数据库内未提交的数据
 				memset(szHttpRebackBuf,0,128);
@@ -211,6 +218,19 @@ void  Proc::threadLoopDatabase()
 									//继续处理
 									goto _redonnc;
 								}
+								else if(0==strncmp("json_error", str->str_data, str->str_len))
+								{
+									printf("[Error] -----------------------------------------------\r\n");
+									printf("[Error] -----------------------------------------------\r\n");
+									printf("[Error] upload json_error content=%s\n",json.c_str());
+									Database::setDBUpdateExceptionKey(gkeyName);
+									netSendCacheAllUserUploadResult(gkeyName,4);
+									printf("[Error] -----------------------------------------------\r\n");
+									printf("[Error] -----------------------------------------------\r\n");
+									//继续处理
+									goto _redonnc;
+								}
+								
 								else //不等于OK即为失败
 								{
 									Database::setDBUpdateExceptionKey(gkeyName);
@@ -231,14 +251,11 @@ void  Proc::threadLoopDatabase()
 				else
 				{
 					printf("[Error] -----------------------------------------------\r\n");
-					printf("[Error] -------- reback json format error fail --------\r\n");
-					printf("[Error] -------- reback json format error fail --------\r\n");
-					printf("[Error] %s\r\n",_WS2S_CSTR(doUrl));
-					printf("[Error] -------- reback json format error fail --------\r\n");
-					printf("[Error] -------- reback json format error fail --------\r\n");
 					printf("[Error] -----------------------------------------------\r\n");
-					printf("Error:: server exception. json=%s\n",json.c_str());
-					netSendCacheAllUserUploadResult(gkeyName,4);
+					printf("Error:: Server exception. json=%s\n",json.c_str());
+					printf("Error:: Server exception. szHttpRebackBuf=%s\n",szHttpRebackBuf);
+					printf("[Error] -----------------------------------------------\r\n");
+					printf("[Error] -----------------------------------------------\r\n");
 				}
 			}
 		}
