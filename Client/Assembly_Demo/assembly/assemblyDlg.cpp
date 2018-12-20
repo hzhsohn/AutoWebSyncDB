@@ -111,6 +111,11 @@ afx_msg LONG CassemblyDlg::msgCacheUploadResult(WPARAM wParam,LPARAM lParam)
 			str.Format(_T("%s,记录已经存在,请勿重复添加"),_S2WS_CSTR(key));
 		}
 			break;
+		case 4:
+		{
+			str.Format(_T("%s,提交参数非JSON格式"),_S2WS_CSTR(key));
+		}
+			break;
 	}
 	setListAdd(str);
 	return TRUE;

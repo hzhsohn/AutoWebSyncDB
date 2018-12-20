@@ -12,7 +12,7 @@ TCHAR  Proc::ini_file[1024]={0};
 TCHAR  Proc::db_file[1024]={0};
 TCHAR Proc::doUrl[2048]={0};
 int Proc::tcpPort=0;
-BYTE Proc::szHttpRebackBuf[128]={0};
+BYTE Proc::szHttpRebackBuf[512]={0};
 BOOL Proc::isThreadRuning=FALSE;
 //--------------------------------------------
 Proc::Proc(void)
@@ -49,7 +49,7 @@ void Proc::Init()
 		//
 		_itot(accessAddr.interval_second,buf1,10);
 		WritePrivateProfileString(_T("Address"),_T("url"),accessAddr.url,ini_file);
-		WritePrivateProfileString(_T("Addasdaress"),_T("interval_second"),buf1,ini_file);
+		WritePrivateProfileString(_T("Address"),_T("interval_second"),buf1,ini_file);
 		//
 		tcpPort=7666;
 		_itot(tcpPort,buf1,10);
@@ -73,9 +73,9 @@ void Proc::Init()
 	{
 		//更新INI
 		WritePrivateProfileString(_T("Database"),_T("path"),db_file,ini_file); 
-		//检测或生成数据库
-		Database::genDB();
 	}
+	//检测或生成数据库
+	Database::genDB();
 
 	//初始化检测
 	if(0==_tcslen(accessAddr.url))
@@ -158,15 +158,28 @@ void  Proc::threadLoopDatabase()
 				_stprintf(doUrl,_T("%s?%s"),accessAddr.url,_S2WS_CSTR(enjson));
 
 				//提交到服务器
-				http.GetFileBuf(doUrl,szHttpRebackBuf,128,0);
-			
+				if(0!=http.GetFileBuf(doUrl,szHttpRebackBuf,512,0))
+				{
+					printf("[Error] -----------------------------------------------\r\n");
+					printf("[Error] ------------- server access fail --------------\r\n");
+					printf("[Error] ------------- server access fail --------------\r\n");
+					printf("[Error] %s\r\n",_WS2S_CSTR(doUrl));
+					printf("[Error] ------------- server access fail --------------\r\n");
+					printf("[Error] ------------- server access fail --------------\r\n");
+					printf("[Error] -----------------------------------------------\r\n");
+					printf("Error:: Server access exception. json=%s\n",json.c_str());
+					//upload reback json data error
+					//继续处理
+					Sleep(2000);
+					goto _redonnc;
+				}
 				//-----------------------
 				//解释返回来网络结果
 				PJOBJECT root = NULL;
 				int i = 0;
 				PJVALUE jsonval; PJSTRING str;
 				int pret=Js_parser_object((void**)&root, (char*)szHttpRebackBuf, &i);
-				if(pret)
+				if(pret!=-1)
 				{
 						jsonval = (PJVALUE)Js_object_get_value(root, "ret");
 						if(jsonval)
@@ -204,31 +217,28 @@ void  Proc::threadLoopDatabase()
 									printf("Error:: data error.submit fail content=%s\n",json.c_str());
 									//回复数据异常
 									//MessageBox(0,_S2WS_CSTR((char*)szHttpRebackBuf),_T("网络数据异常,请联系软件管理员"),0);
-									netSendCacheAllUserUploadResult(gkeyName,3);
+									netSendCacheAllUserUploadResult(gkeyName,0);
 									//继续处理
 									goto _redonnc;
 								}
 							}
 							Js_parser_object_free(root);
 						}
-						else
-						{
-							printf("[Error] -----------------------------------------------\r\n");
-							printf("[Error] ------------- server access fail --------------\r\n");
-							printf("[Error] ------------- server access fail --------------\r\n");
-							printf("[Error] %s\r\n",_WS2S_CSTR(doUrl));
-							printf("[Error] ------------- server access fail --------------\r\n");
-							printf("[Error] ------------- server access fail --------------\r\n");
-							printf("[Error] -----------------------------------------------\r\n");
-							printf("Error:: Server access exception. json=%s\n",json.c_str());
-							//upload reback json data error
-							//继续处理
-							Sleep(2000);
-							goto _redonnc;
-						}
 						//--------------------------			
 						free(enjson);
 						enjson=NULL;
+				}
+				else
+				{
+					printf("[Error] -----------------------------------------------\r\n");
+					printf("[Error] -------- reback json format error fail --------\r\n");
+					printf("[Error] -------- reback json format error fail --------\r\n");
+					printf("[Error] %s\r\n",_WS2S_CSTR(doUrl));
+					printf("[Error] -------- reback json format error fail --------\r\n");
+					printf("[Error] -------- reback json format error fail --------\r\n");
+					printf("[Error] -----------------------------------------------\r\n");
+					printf("Error:: server exception. json=%s\n",json.c_str());
+					netSendCacheAllUserUploadResult(gkeyName,4);
 				}
 			}
 		}

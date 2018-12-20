@@ -36,19 +36,9 @@ static int read_unsync_callback(void *NotUsed, int argc, char **argv, char **azC
 	{
 		if(g_getkeyName)
 		{
-			strcpy(g_getkeyName,argv[0] ? argv[0] : "NULL");
+			strcpy(g_getkeyName,argv[0] ? argv[0] : "");
 		}
-		unsync_ret_buf="{";
-		unsync_ret_buf+="\"key\":";
-		unsync_ret_buf+="\"";
-		unsync_ret_buf+= argv[0] ? argv[0] : "NULL";
-		unsync_ret_buf+="\"";
-		unsync_ret_buf+=",";
-		unsync_ret_buf+="\"val\":";
-		unsync_ret_buf+="\"";
-		unsync_ret_buf+= argv[1] ? argv[1] : "NULL";
-		unsync_ret_buf+="\"";
-		unsync_ret_buf+="}";
+		unsync_ret_buf=argv[1];
 	}
     return 0;
 }
@@ -86,7 +76,7 @@ void Database::genDB()
  
 	// Create table statement	
 	//字段is_sync 0未处理 ,1提交服务器成功, 2提交服务器失败无效json-key ,3网站接口数据回复异常
-	sql = "CREATE TABLE table1(autoid integer PRIMARY KEY autoincrement,key varchar(128) NOT NULL,value TEXT NOT NULL,is_sync tinyint default 0);";
+	sql = "CREATE TABLE table1(autoid integer PRIMARY KEY autoincrement,key varchar(64) NOT NULL,value varchar(2048),is_sync tinyint default 0)";
 	rc = sqlite3_exec(db, sql, NULL, 0, &zErrMsg);
 	if (rc != SQLITE_OK){
 		cout << zErrMsg << endl;

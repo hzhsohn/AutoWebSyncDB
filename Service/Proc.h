@@ -26,7 +26,7 @@ class Proc
 	static TCHAR db_file[1024];
 	static TCHAR doUrl[2048];
 	static int tcpPort;
-	static BYTE szHttpRebackBuf[128];
+	static BYTE szHttpRebackBuf[512];
 	//
 	static BOOL isThreadRuning;
 public:

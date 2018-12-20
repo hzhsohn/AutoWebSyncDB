@@ -61,7 +61,7 @@ void zhRecv(TzhNetSession *sion,void* info,unsigned char*szBuf,int nLen)
 			{
 				netSendJsonToCacheFail(sion,jd->key);
 			}
-			PRINTF("Data ->d->key=%s strJson=%s \n",jd->key,jd->json);
+			PRINTF("ezhCToSDataJsonToCache ->key=%s strJson=%s \n",jd->key,jd->json);
 		}
 		break;
 	}
