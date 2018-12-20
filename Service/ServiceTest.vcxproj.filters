@@ -176,6 +176,9 @@
     <ClInclude Include="zhlist\zhlist_exp.h">
       <Filter>zhlist</Filter>
     </ClInclude>
+    <ClInclude Include="urlcode\c_base64.h">
+      <Filter>urlcode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

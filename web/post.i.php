@@ -32,7 +32,7 @@ if(0==strcmp($parameter,''))
   echo 'not exist parameter.';
 	exit;
 }
-$parameter=urldecode($parameter);
+$parameter=base64_decode($parameter);
 $ipv=getIP();
 //---------------------------------------
 //接收到的字符串 {"_scan":"http://127.0.0.1?a001","_act":"update","operater":"","time":"2018-12-20","batch":"","place":""}

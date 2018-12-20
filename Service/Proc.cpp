@@ -4,6 +4,7 @@
 #include "c-json\js_parser.h"
 #include "Net.h"
 #include "zhlist\zhlist_exp.h"
+#include "urlcode\c_base64.h"
 
 //初始化
 TzhAutoWebAddr Proc::accessAddr;
@@ -153,11 +154,13 @@ void  Proc::threadLoopDatabase()
 				char*szb=(char*)json.c_str();
 				int nnlen=strlen(szb)*5;
 				utf8c=(char *)malloc(nnlen);
+				enjson=(char *)malloc(nnlen);
 				memset(utf8c,0,nnlen);
+				memset(enjson,0,nnlen);
 				//编码转换
 				Gb2312ToUtf8(szb,strlen(szb),utf8c);
-				//加码
-				enjson=urlencode(utf8c,strlen(utf8c),&k);
+				//base64转码提交
+				base64_encode(utf8c,strlen(utf8c),enjson);
 				free(utf8c);
 
 				//循环读取数据库内未提交的数据
