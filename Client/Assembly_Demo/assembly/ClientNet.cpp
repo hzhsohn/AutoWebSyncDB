@@ -91,11 +91,11 @@ void zhRecv(TzhNetSession*sion,void*info,unsigned char*szBuf,int nLen)
 	case ezhSToCDataCacheUploadResult:	//32字节MD5值,1字节上传结果1成功,2失败
 		{
 			char key[36]={0};
-			bool isOK=false;
+			unsigned char ret=0;
 			zhPackReadBinary(&pack,key,32);
-			zhPackReadBool(&pack,&isOK);
-			TRACE("ezhSToCDataCacheUploadResult key=%s isOK=%d\n",key,isOK);
-			SendMessage(g_hwndMainForm,WM_USER+1005,(WPARAM)&key,isOK);
+			zhPackReadUnsignedChar(&pack,&ret);
+			TRACE("ezhSToCDataCacheUploadResult key=%s ret=%d\n",key,ret);
+			SendMessage(g_hwndMainForm,WM_USER+1005,(WPARAM)&key,(int)ret);
 		}
 		break;
 	}

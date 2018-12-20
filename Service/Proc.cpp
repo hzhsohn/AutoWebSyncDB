@@ -165,52 +165,71 @@ void  Proc::threadLoopDatabase()
 				PJOBJECT root = NULL;
 				int i = 0;
 				PJVALUE jsonval; PJSTRING str;
-				Js_parser_object((void**)&root, (char*)szHttpRebackBuf, &i);
-
-				jsonval = (PJVALUE)Js_object_get_value(root, "ret");
-				if(jsonval)
+				int pret=Js_parser_object((void**)&root, (char*)szHttpRebackBuf, &i);
+				if(pret)
 				{
-					if(JS_STRING==jsonval->value_type)
-					{
-						str = (PJSTRING)jsonval->value_data;	//array1
-						if(0==strncmp("ok", str->str_data, str->str_len))
+						jsonval = (PJVALUE)Js_object_get_value(root, "ret");
+						if(jsonval)
 						{
-							printf("upload success content=%s\n",json.c_str());
-							Database::setDBUpdateSuccess(gkeyName);
-							netSendCacheAllUserUploadResult(gkeyName,1);
+							if(JS_STRING==jsonval->value_type)
+							{
+								str = (PJSTRING)jsonval->value_data;	//array1
+								if(0==strncmp("ok", str->str_data, str->str_len))
+								{
+									printf("upload success content=%s\n",json.c_str());
+									Database::setDBUpdateSuccess(gkeyName);
+									netSendCacheAllUserUploadResult(gkeyName,1);//成功
+									//继续处理
+									goto _redonnc;
+								}
+								else if(0==strncmp("invalid", str->str_data, str->str_len))
+								{
+									printf("upload invalid content=%s\n",json.c_str());
+									Database::setDBUpdateInvalidKey(gkeyName);
+									netSendCacheAllUserUploadResult(gkeyName,2);//无效scan_key
+									//继续处理
+									goto _redonnc;
+								}
+								else if(0==strncmp("repeat", str->str_data, str->str_len))
+								{
+									printf("upload repeat content=%s\n",json.c_str());
+									Database::setDBUpdateSuccess(gkeyName);
+									netSendCacheAllUserUploadResult(gkeyName,3);//数据内容重复
+									//继续处理
+									goto _redonnc;
+								}
+								else //不等于OK即为失败
+								{
+									Database::setDBUpdateExceptionKey(gkeyName);
+									printf("Error:: data error.submit fail content=%s\n",json.c_str());
+									//回复数据异常
+									//MessageBox(0,_S2WS_CSTR((char*)szHttpRebackBuf),_T("网络数据异常,请联系软件管理员"),0);
+									netSendCacheAllUserUploadResult(gkeyName,3);
+									//继续处理
+									goto _redonnc;
+								}
+							}
+							Js_parser_object_free(root);
+						}
+						else
+						{
+							printf("[Error] -----------------------------------------------\r\n");
+							printf("[Error] ------------- server access fail --------------\r\n");
+							printf("[Error] ------------- server access fail --------------\r\n");
+							printf("[Error] %s\r\n",_WS2S_CSTR(doUrl));
+							printf("[Error] ------------- server access fail --------------\r\n");
+							printf("[Error] ------------- server access fail --------------\r\n");
+							printf("[Error] -----------------------------------------------\r\n");
+							printf("Error:: Server access exception. json=%s\n",json.c_str());
+							//upload reback json data error
 							//继续处理
+							Sleep(2000);
 							goto _redonnc;
 						}
-						if(0==strncmp("invalid", str->str_data, str->str_len))
-						{
-							Database::setDBUpdateInvalidKey(gkeyName);
-							netSendCacheAllUserUploadResult(gkeyName,2);
-							//继续处理
-							goto _redonnc;
-						}
-						else //不等于OK即为失败
-						{
-							Database::setDBUpdateExceptionKey(gkeyName);
-							printf("Error:: data error.submit fail content=%s\n",json.c_str());
-							//回复数据异常
-							//MessageBox(0,_S2WS_CSTR((char*)szHttpRebackBuf),_T("网络数据异常,请联系软件管理员"),0);
-							netSendCacheAllUserUploadResult(gkeyName,3);
-							//继续处理
-							goto _redonnc;
-						}
-					}
-					Js_parser_object_free(root);
+						//--------------------------			
+						free(enjson);
+						enjson=NULL;
 				}
-				else
-				{
-					printf("Error:: Server access exception. content=%s\n",json.c_str());
-					//upload reback json data error
-					//继续处理
-					goto _redonnc;
-				}
-				//--------------------------			
-				free(enjson);
-				enjson=NULL;
 			}
 		}
 	}

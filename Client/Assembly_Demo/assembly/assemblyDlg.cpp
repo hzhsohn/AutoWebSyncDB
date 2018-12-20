@@ -92,15 +92,25 @@ afx_msg LONG CassemblyDlg::msgCacheDataFail(WPARAM wParam,LPARAM lParam)
 afx_msg LONG CassemblyDlg::msgCacheUploadResult(WPARAM wParam,LPARAM lParam)
 {
 	char*key=(char*)wParam;
-	bool isok=(bool)lParam;
+	int ret=(int)lParam;
 	CString str;
-	if(isok)
+	switch(ret)
 	{
-		str.Format(_T("%s,上传服务器成功!"),_S2WS_CSTR(key));
-	}
-	else
-	{
-		str.Format(_T("%s,上传服务器失败."),_S2WS_CSTR(key));
+		case 1:
+		{
+			str.Format(_T("%s,上传服务器成功!"),_S2WS_CSTR(key));
+		}
+			break;
+		case 2:
+		{
+			str.Format(_T("%s,上传服务器失败."),_S2WS_CSTR(key));
+		}
+			break;
+		case 3:
+		{
+			str.Format(_T("%s,记录已经存在,请勿重复添加"),_S2WS_CSTR(key));
+		}
+			break;
 	}
 	setListAdd(str);
 	return TRUE;
@@ -289,7 +299,7 @@ BOOL CassemblyDlg::genJson(const char*scanContent)
 		//
 		root=cJSON_CreateObject();
 		cJSON_AddStringToObject(root,"_scan",scanContent);
-		cJSON_AddStringToObject(root,"_act","update"); //内容填充模式,追加或更新
+		cJSON_AddStringToObject(root,"_act","update"); //内容填充模式,追加或更新 append or update
 		cJSON_AddStringToObject(root,"operater",_WS2S_CSTR(str0.GetBuffer()));
 		cJSON_AddStringToObject(root,"time",_WS2S_CSTR(str1.GetBuffer()));
 		cJSON_AddStringToObject(root,"batch",_WS2S_CSTR(str2.GetBuffer()));

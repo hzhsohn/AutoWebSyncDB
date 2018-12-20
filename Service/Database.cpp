@@ -115,7 +115,7 @@ void Database::writeDB(char*keyName,char*value)
 		else{
 			cout << "open the database successful!" << endl;
 			
-			temp ="select count(autoid) from table1 where key='";
+			temp ="select count(autoid) from table1 where is_sync=0 and key='";
 			temp +=keyName;
 			temp +="'";
 			sql = temp.c_str();	
