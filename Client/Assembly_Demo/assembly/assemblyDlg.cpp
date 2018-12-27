@@ -12,6 +12,7 @@
 #include "md5\md5.h"
 #include <mmSystem.h>
 #include "getwork.h"
+#include "urlcode\encoding.h"
 
 //shd的定时器通讯循环
 #define SHD_TIMER	1
@@ -39,6 +40,9 @@ void CassemblyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT2, _txtJsonBatch);
 	DDX_Control(pDX, IDC_EDIT3, _txtJsonPlace);
 	DDX_Control(pDX, IDC_EDIT4, _txtJsonOperater);
+	DDX_Control(pDX, IDC_EDIT5, _txtJsonType);
+	DDX_Control(pDX, IDC_SGUN_STATE2, _CacheConnectStatus);
+	DDX_Control(pDX, IDC_CHECK1, isAppendInfo);
 }
 
 BEGIN_MESSAGE_MAP(CassemblyDlg, CDialogEx)
@@ -54,6 +58,7 @@ BEGIN_MESSAGE_MAP(CassemblyDlg, CDialogEx)
 	ON_MESSAGE(WM_USER+1003,msgCacheDataSuccess)
 	ON_MESSAGE(WM_USER+1004,msgCacheDataFail)
 	ON_MESSAGE(WM_USER+1005,msgCacheUploadResult)
+	ON_WM_ACTIVATE()
 END_MESSAGE_MAP()
 
 
@@ -132,10 +137,27 @@ void CassemblyDlg::setConnectCacheServerOK(BOOL b)
 	{
 		BmpA.LoadBitmap(IDB_SGAN_NO);
 	}
+	_CacheConnectStatus.ModifyStyle(0xF,SS_BITMAP|SS_CENTERIMAGE);//设置静态控件的样式，使得它可以使用位图
+	_CacheConnectStatus.SetBitmap((HBITMAP)BmpA);
+	_CacheConnectStatus.ShowWindow(TRUE);
+}
+
+void CassemblyDlg::setScanGunOK(BOOL b)
+{
+	CBitmap BmpA;
+	if(b)
+	{
+		BmpA.LoadBitmap(IDB_SGAN_YES);
+	}
+	else
+	{
+		BmpA.LoadBitmap(IDB_SGAN_NO);
+	}
 	_ScanGunStatus.ModifyStyle(0xF,SS_BITMAP|SS_CENTERIMAGE);//设置静态控件的样式，使得它可以使用位图
 	_ScanGunStatus.SetBitmap((HBITMAP)BmpA);
 	_ScanGunStatus.ShowWindow(TRUE);
 }
+
 
 void CassemblyDlg::setListAdd(CString str)
 {
@@ -213,6 +235,7 @@ void CassemblyDlg::OnPaint()
 	//--------------------------------------------
 	//初始化界面素材
 	setConnectCacheServerOK(FALSE);
+	setScanGunOK(TRUE);
 }
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
@@ -253,6 +276,7 @@ void CassemblyDlg::OnBnClickedButton1()
 		_txtJsonTime.SetReadOnly(TRUE);
 		_txtJsonBatch.SetReadOnly(TRUE);
 		_txtJsonPlace.SetReadOnly(TRUE);
+		_txtJsonType.SetReadOnly(TRUE);
 		//
 		_strJSON="";
 		_lstBox.SetFocus();
@@ -263,6 +287,7 @@ void CassemblyDlg::OnBnClickedButton1()
 		_txtJsonTime.SetReadOnly(FALSE);
 		_txtJsonBatch.SetReadOnly(FALSE);
 		_txtJsonPlace.SetReadOnly(FALSE);
+		_txtJsonType.SetReadOnly(FALSE);
 
 		CString str;
 		str.Format(_T("解锁参数"));
@@ -273,7 +298,7 @@ void CassemblyDlg::OnBnClickedButton1()
 	}
 }
 
-BOOL CassemblyDlg::genJson(const char*scanContent)
+BOOL CassemblyDlg::genJsonUpdate(const char*scanContent)
 {
 	//----------
 	//判断扫描内容的格式是否正确
@@ -294,34 +319,109 @@ BOOL CassemblyDlg::genJson(const char*scanContent)
 		CString str1;
 		CString str2;
 		CString str3;
+		CString str4;
 		_txtJsonOperater.GetWindowText(str0);
 		_txtJsonTime.GetWindowText(str1);
 		_txtJsonBatch.GetWindowText(str2);
 		_txtJsonPlace.GetWindowText(str3);
+		_txtJsonType.GetWindowText(str4);
 
+		//
 		char *out1;
 		cJSON *root;
-		//
 		root=cJSON_CreateObject();
+		//
+		//
 		cJSON_AddStringToObject(root,"_scan",scanContent);
 		cJSON_AddStringToObject(root,"_act","update"); //内容填充模式,追加或更新 append or update
 		cJSON_AddStringToObject(root,"operater",_WS2S_CSTR(str0.GetBuffer()));
 		cJSON_AddStringToObject(root,"time",_WS2S_CSTR(str1.GetBuffer()));
 		cJSON_AddStringToObject(root,"batch",_WS2S_CSTR(str2.GetBuffer()));
 		cJSON_AddStringToObject(root,"place",_WS2S_CSTR(str3.GetBuffer()));
-		//
+		cJSON_AddStringToObject(root,"type",_WS2S_CSTR(str4.GetBuffer()));
 		out1=cJSON_PrintUnformatted(root);
-		//	
-		_strJSON=out1;
-		TRACE("JSON=%s\n",out1);
+				
+		//
+		
+		char *utf8c;
+		utf8c=(char *)malloc(strlen(out1)*5);
+		//编码转换
+		Gb2312ToUtf8(out1,strlen(out1),utf8c);
+
+		_strJSON=utf8c;
+		TRACE("JSON=%s\n",utf8c);
 		//-------------------------------
 		cJSON_Delete(root);
 		free(out1);
+		free(utf8c);
 		//
 		return TRUE;
 	}
 	return FALSE;
 }
+
+
+BOOL CassemblyDlg::genJsonAppend(const char*scanContent)
+{
+	//----------
+	//判断扫描内容的格式是否正确
+	if(memcmp(scanContent,"http",4))//头内容不为http
+	{
+		setListAdd(_T("[错误]----扫描内容格式错误,不为http或https连接"));
+		return FALSE;
+	}
+	if(!strchr(scanContent,'?'))//不存在问号
+	{
+		setListAdd(_T("[错误]----扫描内容格式错误,不存在唯一标识参数"));
+		return FALSE;
+	}
+	//
+	if(_isLockParameter)
+	{		
+		CString str0;
+		CString str1;
+		CString str2;
+		CString str3;
+		CString str4;
+		_txtJsonOperater.GetWindowText(str0);
+		_txtJsonTime.GetWindowText(str1);
+		_txtJsonBatch.GetWindowText(str2);
+		_txtJsonPlace.GetWindowText(str3);
+		_txtJsonType.GetWindowText(str4);
+
+		//
+		char *out1;
+		cJSON *root;
+		root=cJSON_CreateObject();
+		//
+		char *utf8c;
+		utf8c=(char *)malloc(strlen(_WS2S_CSTR(str0.GetBuffer()))*3);
+		//编码转换
+		Gb2312ToUtf8(_WS2S_CSTR(str0.GetBuffer()),strlen(_WS2S_CSTR(str0.GetBuffer())),utf8c);
+		//
+		cJSON_AddStringToObject(root,"_scan",scanContent);
+		cJSON_AddStringToObject(root,"_act","append"); //内容填充模式,追加或更新 append or update
+		//cJSON_AddStringToObject(root,"operater",_WS2S_CSTR(str0.GetBuffer()));
+		cJSON_AddStringToObject(root,"operater",utf8c);
+		cJSON_AddStringToObject(root,"time",_WS2S_CSTR(str1.GetBuffer()));
+		cJSON_AddStringToObject(root,"mark",_WS2S_CSTR(str2.GetBuffer()));
+		cJSON_AddStringToObject(root,"place",_WS2S_CSTR(str3.GetBuffer()));
+		cJSON_AddStringToObject(root,"type",_WS2S_CSTR(str4.GetBuffer()));
+		out1=cJSON_PrintUnformatted(root);
+				
+		//
+		_strJSON=out1;
+		TRACE("JSON=%s\n",out1);
+		//-------------------------------
+		cJSON_Delete(root);
+		free(out1);
+		free(utf8c);
+		//
+		return TRUE;
+	}
+	return FALSE;
+}
+
 
 //搜索枪录入
 BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
@@ -358,7 +458,16 @@ BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
 						if(_isLockParameter)
 						{
 							//生成JSON并提交到缓存服务器
-							if(genJson(strScanGunCache))
+							BOOL sRet;
+							if(isAppendInfo.GetCheck())
+							{
+								sRet=genJsonAppend(strScanGunCache);
+							}
+							else
+							{
+								sRet=genJsonUpdate(strScanGunCache);
+							}
+							if(sRet)
 							{
 								char *json=(char*)_strJSON.c_str();
 								char strMD5[40]={0};
@@ -397,4 +506,19 @@ BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
 			}
 		}
 	return __super::PreTranslateMessage(pMsg);
+}
+
+void CassemblyDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
+{
+	CDialogEx::OnActivate(nState, pWndOther, bMinimized);
+
+	if(nState==WA_INACTIVE)
+    {
+		setScanGunOK(FALSE);
+    } 
+    else
+    {       
+		setScanGunOK(TRUE);
+    }
+
 }

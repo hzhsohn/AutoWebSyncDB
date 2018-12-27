@@ -22,6 +22,9 @@
     <Filter Include="md5">
       <UniqueIdentifier>{ba02f93c-9866-470f-a596-f57559b8fa15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="urlcode">
+      <UniqueIdentifier>{1426b809-0e2b-4f10-a81e-99f2704a3d1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -57,6 +60,12 @@
     <ClInclude Include="getwork.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\urlcode\c_base64.h">
+      <Filter>urlcode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\urlcode\encoding.h">
+      <Filter>urlcode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assembly.cpp">
@@ -76,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="..\md5\md5c.c">
       <Filter>md5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\urlcode\encoding.c">
+      <Filter>urlcode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

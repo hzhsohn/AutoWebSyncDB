@@ -50,12 +50,16 @@ public:
 	//扫描枪
 	BOOL _isGunOK;
 	CStatic _ScanGunStatus;
+	CStatic _CacheConnectStatus;
+	void setScanGunOK(BOOL b);
 	
 	//JSON的内容输入框
 	CEdit _txtJsonOperater;
 	CEdit _txtJsonTime;
 	CEdit _txtJsonBatch;
 	CEdit _txtJsonPlace;
+	CEdit _txtJsonType;
+
 	//生成内容
 	BOOL _isLockParameter;
 	string _strJSON;
@@ -80,5 +84,9 @@ public:
 	afx_msg LONG CassemblyDlg::msgCacheUploadResult(WPARAM wParam,LPARAM lParam);
 	void CassemblyDlg::setConnectCacheServerOK(BOOL b);
 	void CassemblyDlg::setListAdd(CString str);
-	BOOL genJson(const char*scanContent);
+	BOOL CassemblyDlg::genJsonAppend(const char*scanContent);
+	BOOL CassemblyDlg::genJsonUpdate(const char*scanContent);
+	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
+
+	CButton isAppendInfo;
 };
