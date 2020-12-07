@@ -15,7 +15,7 @@ struct TzhAutoWebAddr
 {
 	TCHAR url[512];
 	int interval_second;
-	unsigned long dwOldTime;
+	time_t dwOldTime;
 };
 
 class Proc

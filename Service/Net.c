@@ -1,8 +1,24 @@
 #include "zhTcpServer_select\tcp_serv_select.h"
 #include "Net.h"
+
 //JSON的数据链表
 TzhList g_lstJSONData;
 
+//立即提交
+BOOL g_netCallSubmit=FALSE;
+
+BOOL netCallSubmit()
+{
+	return g_netCallSubmit;
+}
+void netCallSubmitSet()
+{
+	g_netCallSubmit=TRUE;
+}
+void netCallSubmitReset()
+{
+	g_netCallSubmit=FALSE;
+}
 ////////////////////////////////////////////////////////////////////////
 //保活包
 void NetKeepTimeout(TzhNetSession*sion)
@@ -61,7 +77,7 @@ void zhRecv(TzhNetSession *sion,void* info,unsigned char*szBuf,int nLen)
 			{
 				netSendJsonToCacheFail(sion,jd->key);
 			}
-			PRINTF("ezhCToSDataJsonToCache ->key=%s strJson=%s \n",jd->key,jd->json);
+			PRINTF("ezhCToSDataJsonToCache ->key=%s\r\n JSON=%s \r\n",jd->key,jd->json);
 		}
 		break;
 	}

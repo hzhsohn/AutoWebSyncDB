@@ -41,7 +41,7 @@ void Proc::Init()
 		TCHAR buf1[32];
 
 		//默认生成数值
-		_tcscpy(accessAddr.url,_T("http://wl.hx-kong.com/post.i.php"));
+		_tcscpy(accessAddr.url,_T("http://pd.hx-kong.com/post.i.php"));
 		accessAddr.interval_second=20; //默认20秒
 		//生成默认值
 		_itot(accessAddr.interval_second,buf1,10);
@@ -117,6 +117,8 @@ BOOL Proc::Loop()
     {
 			TzhJSONData* p=(TzhJSONData*)eleNode->pElement;
 			Database::writeDB(p->key,p->json);
+			//立即开始搜索数据库,这操作会联动提交数据
+			netCallSubmitSet();
 			//删除链表节点
 			eleNode=zhListNodeFreeAndDelete(lstJSONData,eleNode);
     }
@@ -125,19 +127,22 @@ BOOL Proc::Loop()
 }
 void Proc::End()
 {
-	isThreadRuning=FALSE;
+	isThreadRuning=FALSE; 
 	zhTcpServ_free();
 }
 
 void  Proc::threadLoopDatabase()
 {
+	BOOL netcb=FALSE;\
 	while(isThreadRuning)
 	{
 		//--------------------
-		//定时读取数据库
-		if(time(NULL) - accessAddr.dwOldTime >= accessAddr.interval_second)
+		//定时读取数据库,和检测 到提交请求就上传到云端
+		netcb=netCallSubmit();
+		if((time(NULL) - accessAddr.dwOldTime) >= accessAddr.interval_second || netcb)
 		{
 			char gkeyName[100]={0};
+			netCallSubmitReset();
 			accessAddr.dwOldTime=time(NULL);
 		
 	_redonnc:
@@ -145,7 +150,7 @@ void  Proc::threadLoopDatabase()
 			string json=Database::readUnUpdateTop1(gkeyName);
 			if(json.length()>0)
 			{
-				char *enjson;int k;
+				char *enjson;
 				char*szb=(char*)json.c_str();
 				int nnlen=strlen(szb)*5;
 				enjson=(char *)malloc(nnlen);
@@ -167,7 +172,7 @@ void  Proc::threadLoopDatabase()
 					printf("[Error] ------------- server access fail --------------\r\n");
 					printf("[Error] ------------- server access fail --------------\r\n");
 					printf("[Error] -----------------------------------------------\r\n");
-					printf("Error:: Server access exception. json=%s\n",json.c_str());
+					printf("Error:: Server access exception. json=%s\r\n\r\n\r\n",json.c_str());
 					//upload reback json data error
 					//继续处理
 					Sleep(2000);
@@ -226,8 +231,16 @@ void  Proc::threadLoopDatabase()
 								
 								else //不等于OK即为失败
 								{
+									printf("[Error] -----------------------------------------------\r\n");
+									printf("[Error] ------------- server access fail --------------\r\n");
+									printf("[Error] ------------- server access fail --------------\r\n");
+									printf("[Error] %s\r\n",_WS2S_CSTR(doUrl));
+									printf("[Error] ------------- server access fail --------------\r\n");
+									printf("[Error] ------------- server access fail --------------\r\n");
+									printf("[Error] -----------------------------------------------\r\n");
+									printf("Error:: data error.submit fail content=%s\r\n\r\n\r\n",json.c_str());
+
 									Database::setDBUpdateExceptionKey(gkeyName);
-									printf("Error:: data error.submit fail content=%s\n",json.c_str());
 									//回复数据异常
 									//MessageBox(0,_S2WS_CSTR((char*)szHttpRebackBuf),_T("网络数据异常,请联系软件管理员"),0);
 									netSendCacheAllUserUploadResult(gkeyName,0);

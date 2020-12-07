@@ -40,6 +40,11 @@ bool netSendJsonToCacheSucc(TzhNetSession *sion,char* md532);
 bool netSendJsonToCacheFail(TzhNetSession *sion,char* md532);
 void netSendCacheAllUserUploadResult(char* md532,unsigned char retVal);
 
+//立即提交数据到云服务器
+BOOL netCallSubmit();
+void netCallSubmitSet();
+void netCallSubmitReset();
+
 //-----------------------------------
 TzhList* getJsonDataList();
 

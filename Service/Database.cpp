@@ -87,7 +87,7 @@ void Database::genDB()
 	}
 	sqlite3_close(db);
 }
-void Database::writeDB(char*keyName,char*value)
+BOOL Database::writeDB(char*keyName,char*value)
 {
 		sqlite3 *db;
 		char *zErrMsg = 0;
@@ -95,6 +95,7 @@ void Database::writeDB(char*keyName,char*value)
 		int key=0;
 		const char *sql ;
 		string temp;
+		BOOL ret=FALSE;
 
 		/* Open database */
 		rc = sqlite3_open(StringUtil::ws2utf8(db_file).c_str(), &db);
@@ -103,7 +104,6 @@ void Database::writeDB(char*keyName,char*value)
 			sqlite3_free(zErrMsg);
 		}
 		else{
-			cout << "open the database successful!" << endl;
 			
 			temp ="select count(autoid) from table1 where is_sync=0 and key='";
 			temp +=keyName;
@@ -129,9 +129,15 @@ void Database::writeDB(char*keyName,char*value)
 					cout << zErrMsg << endl;  
 					sqlite3_free(zErrMsg);
 				}
+				else
+				{
+					cout << "write database successful!" << endl;
+					ret=TRUE;
+				}
 			}
 		}
 		sqlite3_close(db);
+		return ret;
 }
 
 void Database::readDB(int start,int count)
@@ -151,7 +157,7 @@ void Database::readDB(int start,int count)
 			sqlite3_free(zErrMsg);
 		}
 		else{
-			cout << "open the database successful!" << endl;
+			//cout << "open the database successful!" << endl;
  
 			temp ="select * from table1 limit ";
 			itoa(start,bufss,10);
@@ -185,8 +191,6 @@ BOOL Database::setDBUpdateSuccess(char* keyName)
 			sqlite3_free(zErrMsg);
 		}
 		else{
-			cout << "open the database successful!" << endl;
- 
 			temp ="update table1 set is_sync=1 where key='";
 			temp+=keyName;
 			temp+="'";
@@ -218,8 +222,6 @@ BOOL Database::setDBUpdateExceptionKey(char* keyName)
 			sqlite3_free(zErrMsg);
 		}
 		else{
-			cout << "open the database successful!" << endl;
- 
 			temp ="update table1 set is_sync=3 where key='";
 			temp+=keyName;
 			temp+="'";
@@ -250,8 +252,6 @@ BOOL Database::setDBUpdateInvalidKey(char* keyName)
 			sqlite3_free(zErrMsg);
 		}
 		else{
-			cout << "open the database successful!" << endl;
- 
 			temp ="update table1 set is_sync=2 where key='";
 			temp+=keyName;
 			temp+="'";
@@ -285,8 +285,6 @@ string Database::readUnUpdateTop1(char* getkeyName)
 			sqlite3_free(zErrMsg);
 		}
 		else{
-			cout << "open the database successful!" << endl;
- 
 			temp ="select key,value from table1 where is_sync=0 LIMIT 1";
 			sql = temp.c_str();	
 			rc = sqlite3_exec(db, sql, read_unsync_callback, 0, &zErrMsg);

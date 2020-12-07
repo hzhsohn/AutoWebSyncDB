@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 景容
+Source Server         : hanzhihong.cn
 Source Server Version : 50637
-Source Host           : 119.23.36.154:3306
+Source Host           : hanzhihong.cn:3306
 Source Database       : trace_sync
 
 Target Server Type    : MYSQL
 Target Server Version : 50637
 File Encoding         : 65001
 
-Date: 2018-12-20 17:57:21
+Date: 2020-12-08 00:47:50
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -27,13 +27,13 @@ CREATE TABLE `tb_append` (
   `ip` varchar(46) NOT NULL,
   `uptime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`autoid`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of tb_append
 -- ----------------------------
-INSERT INTO `tb_append` VALUES ('16', 'a003', '7e9f8a119eece537f07fe4bdf009685f', '{\"operater\":\"11\",\"time\":\"2018-12-20\",\"batch\":\"\",\"place\":\"\"}', '223.74.168.50', '2018-12-20 17:54:12');
-INSERT INTO `tb_append` VALUES ('17', 'a003', '16f2e537ca5b844ae57c1a0fc8a0cdf1', '{\"operater\":\"12\",\"time\":\"2018-12-20\",\"batch\":\"\",\"place\":\"\"}', '223.74.168.50', '2018-12-20 17:54:31');
+INSERT INTO `tb_append` VALUES ('18', 'a001', '22da80db229c5b1c84d7e39f7d7774af', '{\"operater\":\"123\",\"time\":\"2020-12-07\",\"batch\":\"321\",\"place\":\"123\",\"type\":\"123\"}', '101.247.241.96', '2020-12-07 23:21:53');
+INSERT INTO `tb_append` VALUES ('19', 'a001', 'dbd4d37da0f895b24cb9bc4c582cf8a5', '{\"operater\":\"sadfasdf\",\"time\":\"2020-12-08\",\"mark\":\"ssdfadf\",\"place\":\"sdfsaf\",\"type\":\"asdfasdf\"}', '101.247.246.68', '2020-12-08 00:45:41');
 
 -- ----------------------------
 -- Table structure for `tb_board`
@@ -51,27 +51,22 @@ CREATE TABLE `tb_board` (
 -- ----------------------------
 -- Records of tb_board
 -- ----------------------------
-INSERT INTO `tb_board` VALUES ('a001', '{\"operater\":\"\",\"time\":\"2018-12-20\",\"batch\":\"\",\"place\":\"\"}', '223.74.168.50', '2018-12-20 17:23:48', '2018-12-20 17:44:21');
-INSERT INTO `tb_board` VALUES ('a002', 'okok111k', '123', '2018-12-20 17:23:48', '2018-12-20 17:24:33');
-INSERT INTO `tb_board` VALUES ('a003', '{\"operater\":\"\",\"time\":\"2018-12-20\",\"batch\":\"\",\"place\":\"\"}', '223.74.168.50', '2018-12-20 17:23:48', '2018-12-20 17:45:37');
-INSERT INTO `tb_board` VALUES ('a004', 'okok111k', '123', '2018-12-20 17:24:07', '2018-12-20 17:24:17');
+INSERT INTO `tb_board` VALUES ('a001', '{\"operater\":\"阿斯蒂芬\",\"time\":\"2020-12-08\",\"batch\":\"asdfasdf\",\"place\":\"123123\",\"type\":\"asdfasdf\"}', '101.247.246.68', '2020-12-07 23:03:24', '2020-12-08 00:30:40');
+INSERT INTO `tb_board` VALUES ('n888', null, null, '2020-12-07 23:20:05', null);
 
 -- ----------------------------
--- Procedure structure for `sp_add_data`
+-- Procedure structure for `sp_apped_data`
 -- ----------------------------
-DROP PROCEDURE IF EXISTS `sp_add_data`;
+DROP PROCEDURE IF EXISTS `sp_apped_data`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_add_data`(in update1_or_append2 tinyint,in _ip varchar(46),in _scankey varchar(46),in _json varchar(2048) CHARACTER SET utf8)
+CREATE DEFINER=`root`@`%` PROCEDURE `sp_apped_data`(in _ip varchar(46),in _scankey varchar(46),in _json varchar(2048) CHARACTER SET utf8)
     COMMENT '1=添加成功\r\n2=无效scankey\r\n3=追加内容重复'
 begin
 
 declare result_ tinyint;
 
 if exists(select * from tb_board where scan_key=_scankey) then
-	if 1=update1_or_append2 then
-		update tb_board set json=_json,uptime=now(),ip=_ip where scan_key=_scankey ;
-		set result_=1;
-	elseif 2=update1_or_append2 then
+
 		if not exists(select * from tb_append where json_md5=md5(_json)) then
 					insert into tb_append(ip,scan_key,json_md5,json,uptime) 
 								    values(_ip , _scankey ,md5(_json), _json,now());
@@ -79,7 +74,57 @@ if exists(select * from tb_board where scan_key=_scankey) then
 		ELSE					
 					set result_=3;
 		end if;
-	end if;
+
+else
+	set result_=2;
+end if;
+
+select result_;
+
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `sp_new_scankey`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `sp_new_scankey`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `sp_new_scankey`(in _scankey varchar(46))
+    COMMENT '1=添加成功\r\n2=scankey已经存在'
+begin
+
+declare result_ tinyint;
+
+if not exists(select * from tb_board where scan_key=_scankey) then
+		insert into tb_board (scan_key) values(_scankey);
+		set result_=1;
+else
+	set result_=2;
+end if;
+
+select result_;
+
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `sp_update_data`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `sp_update_data`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `sp_update_data`(in _ip varchar(46),in _scankey varchar(46),in _json varchar(2048) CHARACTER SET utf8)
+    COMMENT '1=添加成功\r\n2=无效scankey\r\n3=追加内容重复'
+begin
+
+declare result_ tinyint;
+
+if exists(select * from tb_board where scan_key=_scankey) then
+
+		update tb_board set json=_json,uptime=now(),ip=_ip where scan_key=_scankey ;
+		set result_=1;
+
 else
 	set result_=2;
 end if;
