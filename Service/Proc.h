@@ -23,7 +23,6 @@ class Proc
 	static TzhAutoWebAddr accessAddr;
 	static GCHttp http;
 	static TCHAR ini_file[1024];
-	static TCHAR db_file[1024];
 	static TCHAR doUrl[2048];
 	static int tcpPort;
 	static BYTE szHttpRebackBuf[512];

@@ -45,9 +45,6 @@
     <ClCompile Include="GCHttp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sqlite\shell.c">
-      <Filter>sqlite</Filter>
-    </ClCompile>
     <ClCompile Include="sqlite\sqlite3.c">
       <Filter>sqlite</Filter>
     </ClCompile>

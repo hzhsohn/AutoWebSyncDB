@@ -63,9 +63,9 @@ void Database::genDB()
 	string temp;
 		
 	/* Open database */
-	rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+	rc = sqlite3_open(StringUtil::ws2utf8(db_file).c_str(), &db);
 	if (rc){
-		cout <<  "Can't open database "<<_WS2S_CSTR(db_file) << endl;
+		cout <<  "Can't open database "<< endl;
 		sqlite3_free(zErrMsg);
 		cout <<  "exit(0) program ..." << endl;
 		exit(0);
@@ -97,9 +97,9 @@ void Database::writeDB(char*keyName,char*value)
 		string temp;
 
 		/* Open database */
-		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+		rc = sqlite3_open(StringUtil::ws2utf8(db_file).c_str(), &db);
 		if (rc){
-			cout <<  "Can't open database "<<db_file << endl;
+			cout <<  "Can't open database "<< endl;
 			sqlite3_free(zErrMsg);
 		}
 		else{
@@ -145,9 +145,9 @@ void Database::readDB(int start,int count)
 		char bufss[32]={0};
 
 		/* Open database */
-		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+		rc = sqlite3_open(StringUtil::ws2utf8(db_file).c_str(), &db);
 		if (rc){
-			cout <<  "Can't open database "<<db_file << endl;
+			cout <<  "Can't open database "<< endl;
 			sqlite3_free(zErrMsg);
 		}
 		else{
@@ -179,9 +179,9 @@ BOOL Database::setDBUpdateSuccess(char* keyName)
 		string temp;
 
 		/* Open database */
-		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+		rc = sqlite3_open(StringUtil::ws2utf8(db_file).c_str(), &db);
 		if (rc){
-			cout <<  "Can't open database "<<db_file << endl;
+			cout <<  "Can't open database "<< endl;
 			sqlite3_free(zErrMsg);
 		}
 		else{
@@ -212,9 +212,9 @@ BOOL Database::setDBUpdateExceptionKey(char* keyName)
 		string temp;
 
 		/* Open database */
-		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+		rc = sqlite3_open(StringUtil::ws2utf8(db_file).c_str(), &db);
 		if (rc){
-			cout <<  "Can't open database "<<db_file << endl;
+			cout <<  "Can't open database "<< endl;
 			sqlite3_free(zErrMsg);
 		}
 		else{
@@ -244,9 +244,9 @@ BOOL Database::setDBUpdateInvalidKey(char* keyName)
 		string temp;
 
 		/* Open database */
-		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+		rc = sqlite3_open(StringUtil::ws2utf8(db_file).c_str(), &db);
 		if (rc){
-			cout <<  "Can't open database "<<db_file << endl;
+			cout <<  "Can't open database "<< endl;
 			sqlite3_free(zErrMsg);
 		}
 		else{
@@ -279,9 +279,9 @@ string Database::readUnUpdateTop1(char* getkeyName)
 		g_getkeyName=getkeyName;
 		unsync_ret_buf="";
 		/* Open database */
-		rc = sqlite3_open(_WS2S_CSTR(db_file), &db);
+		rc = sqlite3_open(StringUtil::ws2utf8(db_file).c_str(), &db);
 		if (rc){
-			cout <<  "Can't open database "<<db_file << endl;
+			cout <<  "Can't open database "<< endl;
 			sqlite3_free(zErrMsg);
 		}
 		else{

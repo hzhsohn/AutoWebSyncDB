@@ -10,7 +10,6 @@
 TzhAutoWebAddr Proc::accessAddr;
 GCHttp Proc::http;
 TCHAR  Proc::ini_file[1024]={0};
-TCHAR  Proc::db_file[1024]={0};
 TCHAR Proc::doUrl[2048]={0};
 int Proc::tcpPort=0;
 BYTE Proc::szHttpRebackBuf[512]={0};
@@ -34,7 +33,7 @@ void Proc::Init()
 	{
 		GetPrivateProfileString(_T("Address"),_T("url"),_T(""),accessAddr.url,1024,ini_file);
 		accessAddr.interval_second=GetPrivateProfileInt(_T("Address"),_T("interval_second"),30,ini_file);
-		GetPrivateProfileString(_T("Database"),_T("path"),_T(""),db_file,1024,ini_file);	
+		GetPrivateProfileString(_T("Database"),_T("path"),_T(""),Database::db_file,1024,ini_file);	
 		tcpPort=GetPrivateProfileInt(_T("TCP"),_T("tcp_port"),0,ini_file);
 	}
 	else
@@ -45,9 +44,6 @@ void Proc::Init()
 		_tcscpy(accessAddr.url,_T("http://wl.hx-kong.com/post.i.php"));
 		accessAddr.interval_second=20; //默认20秒
 		//生成默认值
-		assist::getCurrentPath(_T("AutoWebSyncDB.db"),db_file);		
-		WritePrivateProfileString(_T("Database"),_T("path"),db_file,ini_file); 
-		//
 		_itot(accessAddr.interval_second,buf1,10);
 		WritePrivateProfileString(_T("Address"),_T("url"),accessAddr.url,ini_file);
 		WritePrivateProfileString(_T("Address"),_T("interval_second"),buf1,ini_file);
@@ -64,16 +60,15 @@ void Proc::Init()
 		_itot(tcpPort,buf1,10);
 		WritePrivateProfileString(_T("TCP"),_T("tcp_port"),buf1,ini_file);
 	}
-	if(0==_tcslen(db_file))
-	{
-		//生成默认值
-		assist::getCurrentPath(_T("AutoWebSyncDB.db"),db_file);		
-		WritePrivateProfileString(_T("Database"),_T("path"),db_file,ini_file); 
-	}
-	if(0!=_taccess(db_file,0))
+	if(0!=_taccess(Database::db_file,0))
 	{
 		//更新INI
-		WritePrivateProfileString(_T("Database"),_T("path"),db_file,ini_file); 
+		//生成默认值
+		TCHAR sbuf[255]={0};
+		srand(GetTickCount());
+		_stprintf(sbuf,_T("%d.db"),rand()%1000);
+		assist::getCurrentPath(sbuf,Database::db_file);		
+		WritePrivateProfileString(_T("Database"),_T("path"),Database::db_file,ini_file); 
 	}
 	//检测或生成数据库
 	Database::genDB();
@@ -84,6 +79,7 @@ void Proc::Init()
 		cout << "err addrcess.url is null !" << endl;
 		cout <<  "exit(0) program ..." << endl;
 		exit(0);
+
 	}
 	if(0==accessAddr.interval_second)
 	{
@@ -93,9 +89,9 @@ void Proc::Init()
 	}
 
 	cout<<"URL=\""<<_WS2S_CSTR(accessAddr.url)<<"\""<<endl;
-	cout<<"DB=\""<<_WS2S_CSTR(Proc::db_file)<<"\""<<endl;
+	cout<<"DB=\""<<_WS2S_CSTR(Database::db_file)<<"\""<<endl;
 	isThreadRuning=TRUE;
-	_tcscpy(Database::db_file , Proc::db_file);
+	_tcscpy(Database::db_file , Database::db_file);
 	//访问网络
 	http.InitConnect();
 	//数据通讯	
