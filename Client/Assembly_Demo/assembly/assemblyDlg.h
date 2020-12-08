@@ -89,4 +89,8 @@ public:
 	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 
 	CButton isAppendInfo;
+	afx_msg void OnBnClickedCheck1();
+	CStatic _LbJPlace;
+	CStatic _LbJAdr;
+	CStatic _LbPChi;
 };

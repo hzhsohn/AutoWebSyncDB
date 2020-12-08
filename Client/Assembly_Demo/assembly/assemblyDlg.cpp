@@ -43,6 +43,9 @@ void CassemblyDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT5, _txtJsonType);
 	DDX_Control(pDX, IDC_SGUN_STATE2, _CacheConnectStatus);
 	DDX_Control(pDX, IDC_CHECK1, isAppendInfo);
+	DDX_Control(pDX, IDC_JPLACE, _LbJPlace);
+	DDX_Control(pDX, IDC_ADR, _LbJAdr);
+	DDX_Control(pDX, IDC_PCHI, _LbPChi);
 }
 
 BEGIN_MESSAGE_MAP(CassemblyDlg, CDialogEx)
@@ -59,6 +62,7 @@ BEGIN_MESSAGE_MAP(CassemblyDlg, CDialogEx)
 	ON_MESSAGE(WM_USER+1004,msgCacheDataFail)
 	ON_MESSAGE(WM_USER+1005,msgCacheUploadResult)
 	ON_WM_ACTIVATE()
+	ON_BN_CLICKED(IDC_CHECK1, &CassemblyDlg::OnBnClickedCheck1)
 END_MESSAGE_MAP()
 
 
@@ -277,6 +281,7 @@ void CassemblyDlg::OnBnClickedButton1()
 		_txtJsonBatch.SetReadOnly(TRUE);
 		_txtJsonPlace.SetReadOnly(TRUE);
 		_txtJsonType.SetReadOnly(TRUE);
+		isAppendInfo.EnableWindow(FALSE);
 		//
 		_strJSON="";
 		_lstBox.SetFocus();
@@ -288,6 +293,7 @@ void CassemblyDlg::OnBnClickedButton1()
 		_txtJsonBatch.SetReadOnly(FALSE);
 		_txtJsonPlace.SetReadOnly(FALSE);
 		_txtJsonType.SetReadOnly(FALSE);
+		isAppendInfo.EnableWindow(TRUE);
 
 		CString str;
 		str.Format(_T("解锁参数"));
@@ -381,32 +387,28 @@ BOOL CassemblyDlg::genJsonAppend(const char*scanContent)
 		CString str0;
 		CString str1;
 		CString str2;
-		CString str3;
-		CString str4;
 		_txtJsonOperater.GetWindowText(str0);
 		_txtJsonTime.GetWindowText(str1);
 		_txtJsonBatch.GetWindowText(str2);
-		_txtJsonPlace.GetWindowText(str3);
-		_txtJsonType.GetWindowText(str4);
 
 		//
 		char *out1;
 		cJSON *root;
 		root=cJSON_CreateObject();
 		//
-		char *utf8c;
+		char *utf8c, *utf8c2;
 		utf8c=(char *)malloc(strlen(_WS2S_CSTR(str0.GetBuffer()))*3);
+		utf8c2=(char *)malloc(strlen(_WS2S_CSTR(str2.GetBuffer()))*3);
 		//编码转换
 		Gb2312ToUtf8(_WS2S_CSTR(str0.GetBuffer()),strlen(_WS2S_CSTR(str0.GetBuffer())),utf8c);
+		Gb2312ToUtf8(_WS2S_CSTR(str2.GetBuffer()),strlen(_WS2S_CSTR(str2.GetBuffer())),utf8c2);
 		//
 		cJSON_AddStringToObject(root,"_scan",scanContent);
 		cJSON_AddStringToObject(root,"_act","append"); //内容填充模式,追加或更新 append or update
 		//cJSON_AddStringToObject(root,"operater",_WS2S_CSTR(str0.GetBuffer()));
 		cJSON_AddStringToObject(root,"operater",utf8c);
 		cJSON_AddStringToObject(root,"time",_WS2S_CSTR(str1.GetBuffer()));
-		cJSON_AddStringToObject(root,"mark",_WS2S_CSTR(str2.GetBuffer()));
-		cJSON_AddStringToObject(root,"place",_WS2S_CSTR(str3.GetBuffer()));
-		cJSON_AddStringToObject(root,"type",_WS2S_CSTR(str4.GetBuffer()));
+		cJSON_AddStringToObject(root,"mark",utf8c2);
 		out1=cJSON_PrintUnformatted(root);
 				
 		//
@@ -416,6 +418,7 @@ BOOL CassemblyDlg::genJsonAppend(const char*scanContent)
 		cJSON_Delete(root);
 		free(out1);
 		free(utf8c);
+		free(utf8c2);
 		//
 		return TRUE;
 	}
@@ -458,8 +461,9 @@ BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
 						if(_isLockParameter)
 						{
 							//生成JSON并提交到缓存服务器
-							BOOL sRet;
-							if(isAppendInfo.GetCheck())
+							BOOL b=isAppendInfo.GetCheck();
+							BOOL sRet=FALSE;
+							if(b)
 							{
 								sRet=genJsonAppend(strScanGunCache);
 							}
@@ -467,6 +471,7 @@ BOOL CassemblyDlg::PreTranslateMessage(MSG * pMsg)
 							{
 								sRet=genJsonUpdate(strScanGunCache);
 							}
+
 							if(sRet)
 							{
 								char *json=(char*)_strJSON.c_str();
@@ -521,4 +526,26 @@ void CassemblyDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 		setScanGunOK(TRUE);
     }
 
+}
+
+
+void CassemblyDlg::OnBnClickedCheck1()
+{
+	BOOL b=isAppendInfo.GetCheck();
+	if(b)
+	{
+		_txtJsonType.ShowWindow(0);
+		_txtJsonPlace.ShowWindow(0);
+		_LbJPlace.ShowWindow(0);
+		_LbJAdr.ShowWindow(0);
+		_LbPChi.SetWindowText(_T("备注: "));
+	}
+	else
+	{
+		_txtJsonType.ShowWindow(1);
+		_txtJsonPlace.ShowWindow(1);
+		_LbJPlace.ShowWindow(1);
+		_LbJAdr.ShowWindow(1);
+		_LbPChi.SetWindowText(_T("批次: "));
+	}
 }
