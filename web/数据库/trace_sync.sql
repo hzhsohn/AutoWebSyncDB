@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : hanzhihong.cn
+Source Server         : 景容
 Source Server Version : 50637
-Source Host           : hanzhihong.cn:3306
+Source Host           : 119.23.36.154:3306
 Source Database       : trace_sync
 
 Target Server Type    : MYSQL
 Target Server Version : 50637
 File Encoding         : 65001
 
-Date: 2020-12-08 00:47:50
+Date: 2020-12-10 18:05:17
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -27,32 +27,38 @@ CREATE TABLE `tb_append` (
   `ip` varchar(46) NOT NULL,
   `uptime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`autoid`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of tb_append
 -- ----------------------------
 INSERT INTO `tb_append` VALUES ('18', 'a001', '22da80db229c5b1c84d7e39f7d7774af', '{\"operater\":\"123\",\"time\":\"2020-12-07\",\"batch\":\"321\",\"place\":\"123\",\"type\":\"123\"}', '101.247.241.96', '2020-12-07 23:21:53');
 INSERT INTO `tb_append` VALUES ('19', 'a001', 'dbd4d37da0f895b24cb9bc4c582cf8a5', '{\"operater\":\"sadfasdf\",\"time\":\"2020-12-08\",\"mark\":\"ssdfadf\",\"place\":\"sdfsaf\",\"type\":\"asdfasdf\"}', '101.247.246.68', '2020-12-08 00:45:41');
+INSERT INTO `tb_append` VALUES ('20', 'a001', 'b4bdaebcefecd7140747e9808ee742ee', '{\"operater\":\"小龙666\",\"time\":\"2020-12-08\",\"mark\":\"NB6666\",\"place\":\"\",\"type\":\"\"}', '223.74.122.39', '2020-12-08 15:42:03');
+INSERT INTO `tb_append` VALUES ('21', 'a001', '5af6a2f8b1e065a58ecd9139bcadce53', '{\"operater\":\"\",\"time\":\"2020-12-08\",\"mark\":\"\",\"place\":\"\",\"type\":\"\"}', '223.74.122.39', '2020-12-08 15:51:20');
+INSERT INTO `tb_append` VALUES ('22', 'a001', '5b0a915c21bebd4ded64f414bb300028', '{\"operater\":\"中合合\",\"time\":\"2020-12-08\",\"mark\":\"在枯霜要要\"}', '223.74.122.39', '2020-12-08 18:11:47');
 
 -- ----------------------------
 -- Table structure for `tb_board`
 -- ----------------------------
 DROP TABLE IF EXISTS `tb_board`;
 CREATE TABLE `tb_board` (
+  `autoid` bigint(64) unsigned NOT NULL AUTO_INCREMENT,
   `scan_key` varchar(46) NOT NULL,
   `json` varchar(2048) DEFAULT NULL,
   `ip` varchar(46) DEFAULT NULL,
   `create_key_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `uptime` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`scan_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`autoid`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of tb_board
 -- ----------------------------
-INSERT INTO `tb_board` VALUES ('a001', '{\"operater\":\"阿斯蒂芬\",\"time\":\"2020-12-08\",\"batch\":\"asdfasdf\",\"place\":\"123123\",\"type\":\"asdfasdf\"}', '101.247.246.68', '2020-12-07 23:03:24', '2020-12-08 00:30:40');
-INSERT INTO `tb_board` VALUES ('n888', null, null, '2020-12-07 23:20:05', null);
+INSERT INTO `tb_board` VALUES ('5', 'a001', '{\"operater\":\"哈哈666\",\"time\":\"2020-12-08\",\"batch\":\"最牛逼的批次\",\"place\":\"大中国\",\"type\":\"888\"}', '223.74.122.39', '2020-12-07 23:03:24', '2020-12-08 16:01:48');
+INSERT INTO `tb_board` VALUES ('9', '123', null, null, '2020-12-10 18:13:31', null);
+INSERT INTO `tb_board` VALUES ('10', '456', null, null, '2020-12-10 18:13:31', null);
+INSERT INTO `tb_board` VALUES ('11', '789', null, null, '2020-12-10 18:13:31', null);
 
 -- ----------------------------
 -- Procedure structure for `sp_apped_data`
