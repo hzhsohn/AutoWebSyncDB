@@ -41,7 +41,7 @@ void Proc::Init()
 		TCHAR buf1[32];
 
 		//默认生成数值
-		_tcscpy(accessAddr.url,_T("http://pd.hx-kong.com/post.i.php"));
+		_tcscpy(accessAddr.url,_T("http://p.xxxx.com/post.i.php"));
 		accessAddr.interval_second=20; //默认20秒
 		//生成默认值
 		_itot(accessAddr.interval_second,buf1,10);
