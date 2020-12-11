@@ -1,4 +1,3 @@
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <?php
 include "module/phpqrcode/qrlib.php"; 
 require_once("module/Smarty-3.1.16/libs/Smarty.class.php");
@@ -119,6 +118,10 @@ if(strcmp($data,''))
 
 
 ?>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
 <body>
 <table width="80%" border="1" align="center" cellpadding="5" cellspacing="0">
 <form action="?" method="post">
@@ -184,3 +187,4 @@ imgCount+=<?=$i?>;
 document.getElementById("imgcount").innerHTML=imgCount;
 </script>
 </body>
+</html>
